@@ -74,14 +74,14 @@ export default function DashboardPage() {
           <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Insights</h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-stretch">
-          <div className="lg:col-span-4 h-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 items-stretch">
+          <div className="h-full">
             <WeeklyProgressChart />
           </div>
-          <div className="lg:col-span-4 h-full">
+          <div className="h-full">
             <NutrientBreakdown />
           </div>
-          <div className="lg:col-span-4 h-full">
+          <div className="md:col-span-2 lg:col-span-1 h-full">
             <AICoachPanel />
           </div>
         </div>

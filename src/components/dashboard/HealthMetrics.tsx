@@ -36,7 +36,7 @@ function MetricRingCard({
 
   return (
     <div
-      className="p-4 rounded-2xl flex flex-col items-center justify-between text-center h-full relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 group"
+      className="p-2.5 sm:p-4 rounded-2xl flex flex-col items-center justify-between text-center h-full relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 group min-w-0"
       style={{
         background: 'rgba(11, 17, 31, 0.85)',
         border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -45,13 +45,17 @@ function MetricRingCard({
     >
       {/* Soft color halo */}
       <div
-        className="absolute -top-10 left-1/2 -translate-x-1/2 w-28 h-28 rounded-full pointer-events-none"
+        className="absolute -top-10 left-1/2 -translate-x-1/2 w-24 h-24 sm:w-28 sm:h-28 rounded-full pointer-events-none"
         style={{ background: `radial-gradient(circle, ${color}12 0%, transparent 70%)` }}
       />
 
       {/* Circular Progress Ring */}
-      <div className="relative flex-shrink-0 mt-1">
-        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+      <div className="relative flex-shrink-0 mt-0.5 sm:mt-1">
+        <svg
+          viewBox={`0 0 ${size} ${size}`}
+          className="w-13 h-13 sm:w-16 sm:h-16"
+          style={{ transform: 'rotate(-90deg)' }}
+        >
           <circle cx={cx} cy={cx} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={strokeWidth} />
           <circle
             cx={cx}
@@ -70,46 +74,46 @@ function MetricRingCard({
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <Icon className="w-5 h-5" style={{ color }} />
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color }} />
         </div>
       </div>
 
       {/* Metric Data */}
-      <div className="relative min-w-0 w-full mt-2">
-        <span className="block text-lg font-black text-white tracking-tight leading-none">
+      <div className="relative min-w-0 w-full mt-1.5 sm:mt-2">
+        <span className="block text-base sm:text-lg font-black text-white tracking-tight leading-none truncate">
           {valueText}
         </span>
         {targetText ? (
-          <span className="block text-[11px] text-slate-400 font-medium mt-1 truncate">
+          <span className="block text-[10px] sm:text-[11px] text-slate-400 font-medium mt-0.5 sm:mt-1 truncate">
             {targetText}
           </span>
         ) : (
-          <span className="block text-[11px] text-emerald-400 font-semibold mt-1 truncate">
+          <span className="block text-[10px] sm:text-[11px] text-emerald-400 font-semibold mt-0.5 sm:mt-1 truncate">
             Optimal
           </span>
         )}
-        <p className="text-[10px] font-bold mt-1 tracking-[0.08em] uppercase" style={{ color }}>
+        <p className="text-[9px] sm:text-[10px] font-bold mt-0.5 sm:mt-1 tracking-[0.06em] uppercase truncate" style={{ color }}>
           {label}
         </p>
       </div>
 
       {/* Quick +/- Buttons */}
       {onQuickAdd && (
-        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/[0.05] w-full justify-center opacity-70 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 sm:gap-2 mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-white/[0.05] w-full justify-center opacity-80 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onQuickAdd(-1)}
             title="Decrease"
-            className="w-6 h-6 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white flex items-center justify-center text-xs active:scale-95 transition-all"
+            className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white flex items-center justify-center text-xs active:scale-95 transition-all"
           >
-            <Minus className="w-3 h-3" />
+            <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
           </button>
-          <span className="text-[10px] text-slate-500 font-semibold">Quick</span>
+          <span className="text-[9px] sm:text-[10px] text-slate-500 font-semibold hidden sm:inline">Quick</span>
           <button
             onClick={() => onQuickAdd(1)}
             title="Increase"
-            className="w-6 h-6 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white flex items-center justify-center text-xs active:scale-95 transition-all"
+            className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white flex items-center justify-center text-xs active:scale-95 transition-all"
           >
-            <Plus className="w-3 h-3" />
+            <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
           </button>
         </div>
       )}
@@ -142,7 +146,7 @@ export function HealthMetrics() {
     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 h-full">
       {/* Metabolic Calorie Gauge */}
       <div
-        className="md:col-span-5 p-5 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden"
+        className="md:col-span-5 p-4 sm:p-5 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden"
         style={{
           background: 'rgba(11, 17, 31, 0.85)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -158,7 +162,7 @@ export function HealthMetrics() {
       </div>
 
       {/* 3 Metric Rings */}
-      <div className="md:col-span-7 grid grid-cols-3 gap-3">
+      <div className="md:col-span-7 grid grid-cols-3 gap-2 sm:gap-3">
         <MetricRingCard
           value={consumedProtein}
           max={targetMacros.protein}

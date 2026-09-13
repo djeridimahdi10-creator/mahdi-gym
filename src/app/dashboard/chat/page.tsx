@@ -131,7 +131,7 @@ export default function ChatPage() {
 
   return (
     <motion.div
-      className="w-full flex flex-col h-[calc(100vh-140px)] md:h-[calc(100vh-95px)] min-h-[500px]"
+      className="w-full flex flex-col h-[calc(100dvh-175px)] md:h-[calc(100vh-100px)] min-h-[460px]"
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}

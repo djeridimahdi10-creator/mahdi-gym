@@ -198,7 +198,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const { profile, signOut } = useAuthStore()
   const { dailyCalories, meals } = useNutritionStore()
-  const { state, setOpenMobile, setOpen } = useSidebar()
+  const { state, setOpenMobile, setOpen, isMobile } = useSidebar()
   const [query, setQuery] = useState('')
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -255,7 +255,7 @@ export function Sidebar() {
   )
 
   const closeOnMobile = () => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+    if (isMobile) {
       setOpenMobile(false)
     }
   }
@@ -311,27 +311,32 @@ export function Sidebar() {
               )}
             </Link>
 
-            {/* ── Prominent collapse / expand toggle ── */}
+            {/* ── Prominent collapse / expand / close toggle ── */}
             <button
-              onClick={() => setOpen(!isExpanded)}
-              title={isExpanded ? 'Collapse sidebar (Ctrl+B)' : 'Expand sidebar (Ctrl+B)'}
-              aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
+              onClick={() => (isMobile ? setOpenMobile(false) : setOpen(!isExpanded))}
+              title={isMobile ? 'Close menu' : isExpanded ? 'Collapse sidebar (Ctrl+B)' : 'Expand sidebar (Ctrl+B)'}
+              aria-label={isMobile ? 'Close menu' : isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
               className="flex-shrink-0 flex items-center justify-center rounded-xl transition-all duration-200 active:scale-95 group/toggle"
               style={{
                 width: 32,
                 height: 32,
-                background: isExpanded
+                background: isMobile || isExpanded
                   ? 'rgba(255,255,255,0.07)'
                   : 'rgba(16,185,129,0.12)',
-                border: isExpanded
+                border: isMobile || isExpanded
                   ? '1px solid rgba(255,255,255,0.10)'
                   : '1px solid rgba(16,185,129,0.30)',
-                boxShadow: isExpanded
+                boxShadow: isMobile || isExpanded
                   ? '0 2px 8px rgba(0,0,0,0.3)'
                   : '0 2px 12px rgba(16,185,129,0.2)',
               }}
             >
-              {isExpanded ? (
+              {isMobile ? (
+                <X
+                  className="w-4 h-4 text-slate-400 group-hover/toggle:text-white transition-colors"
+                  strokeWidth={2}
+                />
+              ) : isExpanded ? (
                 <PanelLeftClose
                   className="w-4 h-4 text-slate-400 group-hover/toggle:text-white transition-colors"
                   strokeWidth={1.8}
@@ -633,15 +638,15 @@ export function Sidebar() {
           MOBILE BOTTOM DOCK
       ══════════════════════════════ */}
       <nav
-        className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 md:hidden flex items-center justify-around px-3 py-2.5 rounded-2xl"
+        className="fixed bottom-2.5 left-1/2 -translate-x-1/2 z-50 md:hidden flex items-center justify-around px-2 py-2 rounded-2xl"
         style={{
-          background: 'rgba(7,11,24,0.94)',
+          background: 'rgba(7,11,24,0.92)',
           backdropFilter: 'blur(20px) saturate(180%)',
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          border: '1px solid rgba(255,255,255,0.09)',
+          border: '1px solid rgba(255,255,255,0.10)',
           boxShadow: '0 16px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04)',
-          width: 'calc(100% - 24px)',
-          maxWidth: '400px',
+          width: 'calc(100% - 20px)',
+          maxWidth: '390px',
         }}
       >
         {[
@@ -656,13 +661,13 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all"
+              className="flex flex-col items-center gap-0.5 py-1 px-1 rounded-xl transition-all flex-1 min-w-0"
             >
               {/* 3-D mobile dock icon */}
-              <Icon3D item={item} active={active} size={36} />
+              <Icon3D item={item} active={active} size={32} />
               <span
-                className={`text-[9px] font-bold transition-colors ${
-                  active ? 'text-white' : 'text-slate-500'
+                className={`text-[9px] font-bold transition-colors truncate max-w-full text-center ${
+                  active ? 'text-white' : 'text-slate-400'
                 }`}
               >
                 {item.label}

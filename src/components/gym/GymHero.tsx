@@ -105,67 +105,67 @@ export function GymHero({
           </div>
 
           {/* 3D Bento Metrics Row */}
-          <div className="grid grid-cols-3 gap-3 pt-1">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-1">
             {/* Exercises count */}
             <div
-              className="relative rounded-2xl p-4 transition-all duration-300 hover:scale-[1.02]"
+              className="relative rounded-2xl p-2.5 sm:p-4 transition-all duration-300 hover:scale-[1.02] min-w-0"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,240,255,0.08) 0%, rgba(15,23,42,0.6) 100%)',
                 border: '1px solid rgba(0,240,255,0.2)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)',
               }}
             >
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <Activity className="w-4 h-4 text-[#00F0FF]" />
-                <span className="text-[11px] font-medium text-slate-400">Exercises</span>
+              <div className="flex items-center gap-1.5 mb-1 sm:mb-1.5">
+                <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00F0FF] flex-shrink-0" />
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 truncate">Moves</span>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-black text-white tabular-nums" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                <span className="text-lg sm:text-2xl font-black text-white tabular-nums" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                   {exerciseCount}
                 </span>
-                <span className="text-[11px] text-slate-500 font-semibold">moves</span>
+                <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold hidden sm:inline">moves</span>
               </div>
             </div>
 
             {/* Est Duration */}
             <div
-              className="relative rounded-2xl p-4 transition-all duration-300 hover:scale-[1.02]"
+              className="relative rounded-2xl p-2.5 sm:p-4 transition-all duration-300 hover:scale-[1.02] min-w-0"
               style={{
                 background: 'linear-gradient(135deg, rgba(255,179,0,0.08) 0%, rgba(15,23,42,0.6) 100%)',
                 border: '1px solid rgba(255,179,0,0.2)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)',
               }}
             >
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <Clock className="w-4 h-4 text-[#FFB300]" />
-                <span className="text-[11px] font-medium text-slate-400">Duration</span>
+              <div className="flex items-center gap-1.5 mb-1 sm:mb-1.5">
+                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FFB300] flex-shrink-0" />
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 truncate">Duration</span>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-black text-white tabular-nums" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                <span className="text-lg sm:text-2xl font-black text-white tabular-nums" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                   {totalMins}
                 </span>
-                <span className="text-[11px] text-slate-500 font-semibold">min</span>
+                <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold">min</span>
               </div>
             </div>
 
             {/* Est Calories Burn */}
             <div
-              className="relative rounded-2xl p-4 transition-all duration-300 hover:scale-[1.02]"
+              className="relative rounded-2xl p-2.5 sm:p-4 transition-all duration-300 hover:scale-[1.02] min-w-0"
               style={{
                 background: 'linear-gradient(135deg, rgba(255,92,141,0.08) 0%, rgba(15,23,42,0.6) 100%)',
                 border: '1px solid rgba(255,92,141,0.2)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)',
               }}
             >
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <Flame className="w-4 h-4 text-[#FF5C8D]" />
-                <span className="text-[11px] font-medium text-slate-400">Burn Est</span>
+              <div className="flex items-center gap-1.5 mb-1 sm:mb-1.5">
+                <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FF5C8D] flex-shrink-0" />
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 truncate">Est Burn</span>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-black text-white tabular-nums" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                <span className="text-lg sm:text-2xl font-black text-white tabular-nums" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                   {totalKcal}
                 </span>
-                <span className="text-[11px] text-slate-500 font-semibold">kcal</span>
+                <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold">kcal</span>
               </div>
             </div>
           </div>

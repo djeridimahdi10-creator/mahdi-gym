@@ -438,7 +438,7 @@ export function LiveWorkoutModal({
                   {currentEx?.sets.map((s, idx) => (
                     <motion.div
                       key={s.setNum}
-                      className="grid grid-cols-12 items-center p-3 rounded-2xl transition-all"
+                      className="grid grid-cols-12 items-center p-2 sm:p-3 rounded-2xl transition-all"
                       style={{
                         background: s.completed
                           ? 'rgba(16,185,129,0.1)'
@@ -450,46 +450,46 @@ export function LiveWorkoutModal({
                       whileHover={{ scale: 1.01 }}
                     >
                       {/* Set Number */}
-                      <div className="col-span-2 flex items-center gap-1.5">
+                      <div className="col-span-2 flex items-center gap-1">
                         <span className="text-xs font-bold text-white">#{s.setNum}</span>
-                        {s.completed && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
+                        {s.completed && <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400" />}
                       </div>
 
                       {/* Weight Stepper */}
-                      <div className="col-span-4 flex items-center justify-center gap-1.5">
+                      <div className="col-span-4 flex items-center justify-center gap-1 sm:gap-1.5">
                         <button
                           onClick={() => updateSet(idx, 'weight', -2.5)}
-                          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
                         >
-                          <Minus className="w-3 h-3" />
+                          <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         </button>
-                        <span className="w-12 text-center text-sm font-bold text-white tabular-nums">
+                        <span className="w-9 sm:w-12 text-center text-xs sm:text-sm font-bold text-white tabular-nums">
                           {s.weight}
                         </span>
                         <button
                           onClick={() => updateSet(idx, 'weight', 2.5)}
-                          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         </button>
                       </div>
 
                       {/* Reps Stepper */}
-                      <div className="col-span-3 flex items-center justify-center gap-1.5">
+                      <div className="col-span-3 flex items-center justify-center gap-1 sm:gap-1.5">
                         <button
                           onClick={() => updateSet(idx, 'reps', -1)}
-                          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
                         >
-                          <Minus className="w-3 h-3" />
+                          <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         </button>
-                        <span className="w-8 text-center text-sm font-bold text-white tabular-nums">
+                        <span className="w-6 sm:w-8 text-center text-xs sm:text-sm font-bold text-white tabular-nums">
                           {s.reps}
                         </span>
                         <button
                           onClick={() => updateSet(idx, 'reps', 1)}
-                          className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
+                          className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                         </button>
                       </div>
 
@@ -497,7 +497,7 @@ export function LiveWorkoutModal({
                       <div className="col-span-3 flex justify-end">
                         <button
                           onClick={() => toggleComplete(idx)}
-                          className="px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                          className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer"
                           style={
                             s.completed
                               ? {
@@ -516,7 +516,7 @@ export function LiveWorkoutModal({
                             <>Done</>
                           ) : (
                             <>
-                              <CheckCircle2 className="w-3.5 h-3.5" /> Log
+                              <CheckCircle2 className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Log</span>
                             </>
                           )}
                         </button>

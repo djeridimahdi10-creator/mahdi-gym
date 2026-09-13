@@ -1032,23 +1032,24 @@ export default function ScanPage() {
                         </div>
 
                         {/* Portion adjustment buttons */}
-                        <div className="flex items-center justify-between pt-1 border-t border-white/[0.04]">
-                          <span className="text-[10px] text-slate-500">Portion Scale:</span>
-                          <div className="flex items-center gap-1.5">
+                        <div className="flex items-center justify-between pt-1 border-t border-white/[0.04] gap-2">
+                          <span className="text-[10px] text-slate-500 flex-shrink-0">Portion:</span>
+                          <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap justify-end">
                             {[
-                              { label: 'Small (0.8x)', val: 0.8 },
-                              { label: 'Regular (1.0x)', val: 1.0 },
-                              { label: 'Large (1.3x)', val: 1.3 },
+                              { label: 'Small (0.8x)', short: '0.8x S', val: 0.8 },
+                              { label: 'Regular (1.0x)', short: '1.0x Reg', val: 1.0 },
+                              { label: 'Large (1.3x)', short: '1.3x L', val: 1.3 },
                             ].map((p) => (
                               <button
                                 key={p.val}
                                 onClick={() => handlePortionChange(i, p.val)}
-                                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${mult === p.val
+                                className={`px-2 sm:px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${mult === p.val
                                     ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20'
                                     : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
                                   }`}
                               >
-                                {p.label}
+                                <span className="sm:hidden">{p.short}</span>
+                                <span className="hidden sm:inline">{p.label}</span>
                               </button>
                             ))}
                           </div>

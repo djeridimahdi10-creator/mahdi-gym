@@ -80,14 +80,21 @@ export const SidebarProvider = React.forwardRef<
       [setOpenProp, open]
     )
 
-    // Handle mobile media query
+    // Handle mobile and tablet media queries
     React.useEffect(() => {
-      const checkMobile = () => {
-        setIsMobile(window.innerWidth < 768)
+      const checkDevice = () => {
+        const width = window.innerWidth
+        setIsMobile(width < 768)
+        // On tablet portrait (768px to 1023px), collapse to icon rail by default to give maximum space to dashboard cards
+        if (width >= 768 && width < 1024) {
+          if (typeof document !== 'undefined' && !document.cookie.includes(`${SIDEBAR_COOKIE_NAME}=`)) {
+            _setOpen(false)
+          }
+        }
       }
-      checkMobile()
-      window.addEventListener('resize', checkMobile)
-      return () => window.removeEventListener('resize', checkMobile)
+      checkDevice()
+      window.addEventListener('resize', checkDevice)
+      return () => window.removeEventListener('resize', checkDevice)
     }, [])
 
     const toggleSidebar = React.useCallback(() => {

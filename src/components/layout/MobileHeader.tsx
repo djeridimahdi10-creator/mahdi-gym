@@ -3,19 +3,18 @@
 import Link from 'next/link'
 import { Menu, Activity, Bell, Search, Sparkles } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
-import { useUIStore } from '@/stores/uiStore'
-import { Avatar } from '@/components/ui'
+import { Avatar, useSidebar } from '@/components/ui'
 
 export function MobileHeader() {
   const { profile } = useAuthStore()
-  const { toggleSidebar, setSidebarOpen } = useUIStore()
+  const { setOpenMobile, toggleSidebar } = useSidebar()
 
   const userName = profile?.full_name?.split(' ')[0] || 'Mahdi'
   const userInitial = userName.charAt(0).toUpperCase()
 
   return (
     <header
-      className="md:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b transition-all"
+      className="md:hidden sticky top-0 z-30 flex items-center justify-between px-3.5 sm:px-4 py-2.5 sm:py-3 border-b transition-all"
       style={{
         background: 'rgba(6, 11, 24, 0.94)',
         backdropFilter: 'blur(20px) saturate(180%)',
@@ -25,11 +24,11 @@ export function MobileHeader() {
       }}
     >
       {/* Left: Hamburger Menu & Brand */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5 sm:gap-3">
         <button
-          onClick={toggleSidebar}
-          aria-label="Open menu"
-          className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+          onClick={() => setOpenMobile(true)}
+          aria-label="Open navigation menu"
+          className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 hover:text-white active:scale-95 transition-all"
           style={{
             background: 'rgba(255, 255, 255, 0.05)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -65,7 +64,7 @@ export function MobileHeader() {
       {/* Right: Search, Notifications & Avatar */}
       <div className="flex items-center gap-2">
         <button
-          onClick={() => setSidebarOpen(true)}
+          onClick={() => setOpenMobile(true)}
           aria-label="Search"
           className="w-8.5 h-8.5 rounded-xl flex items-center justify-center text-slate-400 hover:text-white transition-colors"
           style={{

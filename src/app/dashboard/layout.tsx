@@ -83,11 +83,11 @@ export default function DashboardLayout({
         {/* Main content — flex-1, min-w-0 prevents content from overflowing */}
         <SidebarInset
           data-dashboard-main
-          className="min-h-screen pb-24 md:pb-8"
+          className="min-h-screen pb-32 md:pb-10"
         >
           <MobileHeader />
 
-          <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-5 sm:py-6 lg:py-8">
+          <div className="w-full mx-auto px-3 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-4 sm:py-6 lg:py-8">
             {children}
           </div>
         </SidebarInset>

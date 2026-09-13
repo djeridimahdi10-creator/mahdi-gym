@@ -86,14 +86,14 @@ export function QuickControlBar({ onOpenQuickLog }: QuickControlBarProps) {
         }}
       >
         {/* Day Selector */}
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06] self-start sm:self-auto">
+        <div className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/[0.06]">
           {(['yesterday', 'today', 'tomorrow'] as const).map((day) => {
             const isSelected = selectedDay === day
             return (
               <button
                 key={day}
                 onClick={() => setSelectedDay(day)}
-                className={`px-3 py-1.5 rounded-md text-xs font-bold capitalize transition-all duration-200 flex items-center gap-1.5 ${
+                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all duration-200 flex items-center justify-center gap-1.5 ${
                   isSelected
                     ? 'bg-emerald-500 text-white shadow-[0_2px_10px_rgba(16,185,129,0.3)]'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
@@ -109,7 +109,7 @@ export function QuickControlBar({ onOpenQuickLog }: QuickControlBarProps) {
         </div>
 
         {/* Goal Mode Switcher */}
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap flex-1 justify-center">
+        <div className="w-full sm:w-auto flex items-center gap-1.5 sm:gap-2 flex-1 justify-center">
           {modes.map((mode) => {
             const Icon = mode.icon
             const active = goalMode === mode.id
@@ -117,7 +117,7 @@ export function QuickControlBar({ onOpenQuickLog }: QuickControlBarProps) {
               <button
                 key={mode.id}
                 onClick={() => setGoalMode(mode.id)}
-                className={`flex items-center gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all duration-200 relative ${
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all duration-200 relative ${
                   active ? 'scale-[1.02]' : 'hover:scale-[1.01] opacity-80 hover:opacity-100'
                 }`}
                 style={{
@@ -127,10 +127,10 @@ export function QuickControlBar({ onOpenQuickLog }: QuickControlBarProps) {
                   boxShadow: active ? `0 4px 16px ${mode.color}25` : 'none',
                 }}
               >
-                <Icon className="w-3.5 h-3.5" style={{ color: mode.color }} />
+                <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: mode.color }} />
                 <span>{mode.label}</span>
                 <span
-                  className="text-[10px] px-1.5 py-0.2 rounded font-bold hidden sm:inline-block"
+                  className="text-[10px] px-1.5 py-0.2 rounded font-bold hidden md:inline-block"
                   style={{
                     background: active ? `${mode.color}25` : 'rgba(255,255,255,0.05)',
                     color: active ? '#ffffff' : '#64748b',
@@ -144,10 +144,10 @@ export function QuickControlBar({ onOpenQuickLog }: QuickControlBarProps) {
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2 justify-end">
+        <div className="w-full sm:w-auto flex items-center gap-2 justify-end">
           <button
             onClick={() => setCustomizeOpen(!customizeOpen)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 border ${
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 border ${
               customizeOpen
                 ? 'bg-purple-500/15 text-purple-300 border-purple-500/35'
                 : 'text-slate-300 hover:text-white bg-white/[0.04] border-white/[0.06] hover:bg-white/[0.08]'
@@ -161,14 +161,14 @@ export function QuickControlBar({ onOpenQuickLog }: QuickControlBarProps) {
           {onOpenQuickLog && (
             <button
               onClick={onOpenQuickLog}
-              className="flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold text-white transition-all duration-200 hover:scale-[1.02]"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white transition-all duration-200 hover:scale-[1.02] active:scale-95"
               style={{
                 background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 boxShadow: '0 4px 14px rgba(16,185,129,0.3)',
               }}
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Quick Log</span>
+              <span>Quick Log</span>
             </button>
           )}
         </div>

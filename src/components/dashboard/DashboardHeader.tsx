@@ -38,35 +38,36 @@ export function DashboardHeader({ onOpenGuide }: DashboardHeaderProps) {
   return (
     <header className="space-y-4 w-full">
       {/* Main greeting */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-        <div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
           <h1
-            className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight"
+            className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight truncate"
             style={{ fontFamily: 'Space Grotesk, sans-serif' }}
           >
             {getGreeting()}, {userName}
           </h1>
-          <p className="text-slate-400 text-sm mt-1.5 font-medium flex items-center gap-1.5">
+          <p className="text-slate-400 text-xs sm:text-sm mt-1 font-medium flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-slate-500" />
             {formattedDate}
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={onOpenGuide}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-all duration-200 hover:bg-white/[0.06]"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white transition-all duration-200 hover:bg-white/[0.06]"
             style={{
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            <BookOpen className="w-4 h-4 text-purple-400" />
-            <span>Beginner Guide</span>
+            <BookOpen className="w-3.5 h-3.5 text-purple-400" />
+            <span className="hidden sm:inline">Beginner Guide</span>
+            <span className="sm:hidden">Guide</span>
           </button>
 
           <button
-            className="relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 hover:bg-white/[0.06] text-slate-400 hover:text-white"
+            className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all duration-200 hover:bg-white/[0.06] text-slate-400 hover:text-white"
             style={{
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.08)',
@@ -81,14 +82,14 @@ export function DashboardHeader({ onOpenGuide }: DashboardHeaderProps) {
 
       {/* Quick stats ribbon */}
       <div
-        className="flex items-center justify-between gap-3 lg:gap-4 px-4 sm:px-5 py-3 rounded-2xl overflow-x-auto scrollbar-none w-full"
+        className="flex items-center gap-3.5 sm:gap-4.5 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-2xl overflow-x-auto scrollbar-none w-full"
         style={{
           background: 'rgba(11, 17, 31, 0.75)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
         }}
       >
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
           <span className="text-xs font-semibold text-slate-300 whitespace-nowrap">
             <span className="text-white font-bold">{consumedCalories.toLocaleString()}</span>
@@ -98,7 +99,7 @@ export function DashboardHeader({ onOpenGuide }: DashboardHeaderProps) {
 
         <div className="w-px h-4 bg-white/[0.08] flex-shrink-0" />
 
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           <span className="text-xs font-semibold text-slate-400 whitespace-nowrap">
             <span className="text-emerald-400 font-bold">{caloriePct}%</span> of daily goal
           </span>
@@ -106,7 +107,7 @@ export function DashboardHeader({ onOpenGuide }: DashboardHeaderProps) {
 
         <div className="w-px h-4 bg-white/[0.08] flex-shrink-0" />
 
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           <Flame className="w-3.5 h-3.5 text-orange-400" />
           <span className="text-xs font-semibold text-slate-400 whitespace-nowrap">
             <span className="text-orange-400 font-bold">{remainingCalories.toLocaleString()}</span> kcal left
@@ -115,7 +116,7 @@ export function DashboardHeader({ onOpenGuide }: DashboardHeaderProps) {
 
         <div className="w-px h-4 bg-white/[0.08] flex-shrink-0" />
 
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           <Zap className="w-3.5 h-3.5 text-purple-400" />
           <span className="text-xs font-semibold text-slate-400 whitespace-nowrap">
             <span className="text-purple-400 font-bold">{consumedProtein}g</span>
@@ -125,7 +126,7 @@ export function DashboardHeader({ onOpenGuide }: DashboardHeaderProps) {
 
         <div className="w-px h-4 bg-white/[0.08] flex-shrink-0" />
 
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           <Droplets className="w-3.5 h-3.5 text-cyan-400" />
           <span className="text-xs font-semibold text-slate-400 whitespace-nowrap">
             <span className="text-cyan-400 font-bold">{waterConsumed.toFixed(1)}L</span>
@@ -135,7 +136,7 @@ export function DashboardHeader({ onOpenGuide }: DashboardHeaderProps) {
 
         <div className="w-px h-4 bg-white/[0.08] flex-shrink-0" />
 
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
           <span className="text-xs font-semibold text-slate-400 whitespace-nowrap">
             <span className="text-amber-400 font-bold">7</span> day streak
