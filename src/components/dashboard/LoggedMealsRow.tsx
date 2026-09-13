@@ -1,136 +1,118 @@
 'use client'
 
+import React from 'react'
 import Link from 'next/link'
-import { Utensils, Check, Plus, Sun, Apple, Moon } from 'lucide-react'
+import { Utensils, Plus, ChevronRight } from 'lucide-react'
+import { useNutritionStore } from '@/stores/nutritionStore'
+import { MealBadgeSVG } from './DashboardVisuals'
 
-export function LoggedMealsRow() {
-  const loggedMeals = [
-    {
-      name: 'Breakfast',
-      calories: '620 kcal',
-      time: '7:30 AM',
-      completed: true,
-      emoji: '🍳',
-      color: '#f59e0b',
-      bg: 'rgba(245, 158, 11, 0.15)',
-      border: 'rgba(245, 158, 11, 0.3)',
-    },
-    {
-      name: 'Lunch',
-      calories: '780 kcal',
-      time: '12:30 PM',
-      completed: true,
-      emoji: '🥗',
-      color: '#10b981',
-      bg: 'rgba(16, 185, 129, 0.15)',
-      border: 'rgba(16, 185, 129, 0.3)',
-    },
-    {
-      name: 'Snack',
-      calories: '120 kcal',
-      time: '3:30 PM',
-      completed: true,
-      emoji: '🍎',
-      color: '#f43f5e',
-      bg: 'rgba(244, 63, 94, 0.15)',
-      border: 'rgba(244, 63, 94, 0.3)',
-    },
-    {
-      name: 'Dinner',
-      calories: 'Pending',
-      time: '7:00 PM',
-      completed: false,
-      emoji: '🍲',
-      color: '#a855f7',
-      bg: 'rgba(168, 85, 247, 0.15)',
-      border: 'rgba(168, 85, 247, 0.3)',
-    },
-  ]
+interface LoggedMealsRowProps {
+  onOpenQuickLog?: () => void
+}
+
+export function LoggedMealsRow({ onOpenQuickLog }: LoggedMealsRowProps) {
+  const { meals, toggleMealEaten } = useNutritionStore()
 
   return (
     <div
-      className="p-6 rounded-2xl flex flex-col justify-between h-full space-y-4"
+      className="p-5 rounded-2xl flex flex-col h-full"
       style={{
         background: 'rgba(11, 17, 31, 0.85)',
         border: '1px solid rgba(255, 255, 255, 0.08)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.25)',
       }}
     >
-      {/* Title Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-            <Utensils className="w-4 h-4" />
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center">
+            <Utensils className="w-4.5 h-4.5 text-emerald-400" />
           </div>
-          <h3 className="text-base font-bold text-white tracking-wide">Today&apos;s Logged Meals</h3>
+          <div>
+            <h3 className="text-base font-bold text-white tracking-wide">Today&apos;s Food Intake</h3>
+            <p className="text-[11px] text-slate-400 font-medium mt-0.5">Your meal journal</p>
+          </div>
         </div>
+
+        <Link
+          href="/dashboard/nutrition"
+          className="flex items-center gap-1 text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors"
+        >
+          <span>View All</span>
+          <ChevronRight className="w-3.5 h-3.5" />
+        </Link>
       </div>
 
-      {/* Meal Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-3 sm:gap-3.5 flex-1">
-        {loggedMeals.map((meal) => (
-          <div
-            key={meal.name}
-            className="p-3 sm:p-4 rounded-xl flex flex-col items-center text-center justify-between relative transition-all duration-200 hover:scale-[1.02] hover:border-white/15"
-            style={{
-              background: 'rgba(15, 23, 42, 0.6)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
-            }}
-          >
-            {/* Meal Icon Thumbnail Box */}
+      {/* Meal Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 flex-1">
+        {meals.map((meal, index) => {
+          const typeKey = meal.type as 'breakfast' | 'lunch' | 'snack' | 'dinner'
+
+          return (
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl mb-2 flex-shrink-0"
-              style={{
-                background: meal.bg,
-                border: `1px solid ${meal.border}`,
-                boxShadow: `0 4px 16px ${meal.color}20`,
-              }}
-            >
-              {meal.emoji}
-            </div>
-
-            {/* Meal Details */}
-            <div>
-              <p className="text-xs sm:text-sm font-bold text-white">{meal.name}</p>
-              <p
-                className={`text-xs sm:text-sm font-black mt-0.5 ${
-                  meal.completed ? 'text-emerald-400' : 'text-purple-400'
+              key={meal.type}
+              className={`p-3.5 rounded-2xl flex flex-col justify-between relative transition-all duration-200 border text-left ${meal.eaten
+                  ? 'bg-slate-900/70 border-white/[0.08] hover:border-emerald-500/25'
+                  : 'bg-slate-900/35 border-dashed border-white/[0.08]'
                 }`}
-              >
-                {meal.calories}
-              </p>
-              <p className="text-[11px] text-slate-400 font-medium mt-0.5">{meal.time}</p>
-            </div>
-
-            {/* Completion Indicator */}
-            <div className="mt-3">
-              {meal.completed ? (
-                <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                  <Check className="w-3 h-3 stroke-[3]" />
+            >
+              {/* Badge + Toggle */}
+              <div className="flex items-center justify-between gap-1 mb-2">
+                <div className="w-8 h-8 flex-shrink-0">
+                  <MealBadgeSVG type={typeKey} />
                 </div>
-              ) : (
-                <div className="w-5 h-5 rounded-full border border-slate-700 flex items-center justify-center" />
-              )}
-            </div>
-          </div>
-        ))}
+                <button
+                  onClick={() => toggleMealEaten(index)}
+                  className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all duration-200 ${meal.eaten
+                      ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                      : 'bg-white/[0.05] text-slate-400 border border-white/[0.08] hover:text-white'
+                    }`}
+                >
+                  {meal.eaten ? '✓ Done' : 'Pending'}
+                </button>
+              </div>
 
-        {/* Add Meal Empty State Card */}
-        <Link href="/dashboard/scan" className="block">
-          <div
-            className="p-4 rounded-xl flex flex-col items-center justify-center text-center h-full transition-all duration-200 hover:bg-white/[0.05] cursor-pointer group min-h-[140px]"
-            style={{
-              background: 'rgba(15, 23, 42, 0.35)',
-              border: '1.5px dashed rgba(255, 255, 255, 0.15)',
-            }}
-          >
-            <div className="w-10 h-10 rounded-full bg-white/[0.08] flex items-center justify-center text-slate-300 group-hover:text-white group-hover:scale-110 transition-all mb-2">
-              <Plus className="w-5 h-5" />
+              {/* Title & Calories */}
+              <div>
+                <p className="text-xs font-bold text-white capitalize">{meal.type}</p>
+                <p className="text-sm font-black text-emerald-400 mt-0.5">
+                  {meal.totalCalories} kcal
+                </p>
+              </div>
+
+              {/* Food Items */}
+              <div className="space-y-1 mt-2 pt-2 border-t border-white/[0.05]">
+                {meal.foods.slice(0, 2).map((food) => (
+                  <div key={food.name} className="flex items-center justify-between text-[10px] text-slate-400">
+                    <span className="truncate max-w-[90px]">{food.name}</span>
+                    <span className="text-slate-300 font-semibold">{food.calories}</span>
+                  </div>
+                ))}
+                {meal.foods.length > 2 && (
+                  <p className="text-[9.5px] text-emerald-400/80 font-bold">
+                    +{meal.foods.length - 2} more items
+                  </p>
+                )}
+              </div>
             </div>
-            <p className="text-xs sm:text-sm font-bold text-slate-200 group-hover:text-white">+ Add Meal</p>
-            <p className="text-[10px] text-slate-400 mt-0.5">Manually log meal</p>
+          )
+        })}
+
+        {/* Add Meal Slot */}
+        <button
+          type="button"
+          onClick={onOpenQuickLog}
+          className="p-3.5 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-200 hover:bg-white/[0.04] cursor-pointer group min-h-[140px] border border-dashed border-white/15 hover:border-emerald-400/40"
+          style={{ background: 'rgba(15, 23, 42, 0.3)' }}
+        >
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/12 border border-emerald-500/25 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-200 mb-2">
+            <Plus className="w-5 h-5" />
           </div>
-        </Link>
+          <p className="text-xs font-bold text-slate-200 group-hover:text-white">
+            + Quick Log Food
+          </p>
+          <p className="text-[10px] text-slate-400 mt-0.5">Presets or custom</p>
+        </button>
       </div>
     </div>
   )

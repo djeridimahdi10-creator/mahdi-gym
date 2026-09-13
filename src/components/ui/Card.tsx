@@ -1,59 +1,82 @@
-'use client'
+import * as React from "react"
+import { cn } from "@/lib/utils"
 
-import { cn } from '@/lib/utils'
-
-interface CardProps {
-  variant?: 'default' | 'hover' | 'static' | 'premium' | 'inset'
-  className?: string
-  style?: React.CSSProperties
-  onClick?: React.MouseEventHandler<HTMLDivElement>
-  children: React.ReactNode
-}
-
-export function Card({ variant = 'default', className, style, onClick, children }: CardProps) {
-  const variants = {
-    default: 'glass-card',
-    hover: 'glass-card',
-    static: 'glass-card-static',
-    premium: 'card-premium',
-    inset: 'card-inset',
+const Card = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { variant?: 'default' | 'hover' | 'static' | 'premium' | 'glass' }
+>(({ className, variant = 'default', ...props }, ref) => {
+  const variantStyles = {
+    default: 'rounded-2xl border border-white/10 bg-dark-900/80 text-dark-100 shadow-xl backdrop-blur-xl',
+    hover: 'rounded-2xl border border-white/10 bg-dark-900/80 text-dark-100 shadow-xl backdrop-blur-xl hover:border-white/20 hover:-translate-y-1 transition-all duration-300',
+    static: 'rounded-2xl border border-white/10 bg-dark-900/90 text-dark-100 shadow-lg',
+    premium: 'rounded-3xl border border-primary-500/30 bg-gradient-to-br from-primary-950/40 via-dark-900/90 to-dark-950 shadow-2xl backdrop-blur-2xl',
+    glass: 'rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md',
   }
 
   return (
-    <div className={cn(variants[variant], 'p-6 sm:p-7 lg:p-8', className)} style={style} onClick={onClick}>
-      {children}
-    </div>
+    <div
+      ref={ref}
+      className={cn(variantStyles[variant], className)}
+      {...props}
+    />
   )
-}
+})
+Card.displayName = "Card"
 
-export function CardHeader({ className, children }: { className?: string; children: React.ReactNode }) {
-  return (
-    <div className={cn('mb-5', className)}>
-      {children}
-    </div>
-  )
-}
+const CardHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    {...props}
+  />
+))
+CardHeader.displayName = "CardHeader"
 
-export function CardTitle({ className, children }: { className?: string; children: React.ReactNode }) {
-  return (
-    <h3 className={cn('text-lg font-bold text-white leading-snug tracking-tight', className)} style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-      {children}
-    </h3>
-  )
-}
+const CardTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn("font-display font-bold text-lg text-white leading-tight tracking-tight", className)}
+    {...props}
+  />
+))
+CardTitle.displayName = "CardTitle"
 
-export function CardDescription({ className, children }: { className?: string; children: React.ReactNode }) {
-  return (
-    <p className={cn('text-xs leading-relaxed text-dark-400 mt-1', className)}>
-      {children}
-    </p>
-  )
-}
+const CardDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn("text-xs text-dark-400 leading-relaxed", className)}
+    {...props}
+  />
+))
+CardDescription.displayName = "CardDescription"
 
-export function CardContent({ className, children }: { className?: string; children: React.ReactNode }) {
-  return (
-    <div className={cn('', className)}>
-      {children}
-    </div>
-  )
-}
+const CardContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+))
+CardContent.displayName = "CardContent"
+
+const CardFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex items-center p-6 pt-0", className)}
+    {...props}
+  />
+))
+CardFooter.displayName = "CardFooter"
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }

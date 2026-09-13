@@ -327,7 +327,7 @@ export async function puterAnalyzeImage(
   ]
 
   const opts: PuterChatOptions = {
-    model: options.model ?? PUTER_MODELS.GPT_5_6_LUNA,
+    model: options.model ?? PUTER_MODELS.GPT_4O_MINI,
     max_tokens: options.maxTokens ?? 1000,
   }
 
@@ -568,18 +568,46 @@ Be accurate with calorie estimates. Return ONLY the JSON, no other text.`
   ]
 
   const opts: PuterChatOptions = {
-    model: PUTER_MODELS.GPT_5_6_LUNA,
+    model: PUTER_MODELS.GPT_4O_MINI,
     max_tokens: 1000,
   }
 
-  const result = await puter.ai.chat(messages, opts)
-  const text = typeof result === 'string' ? result : ''
+  let text = ''
+  try {
+    const result = await puter.ai.chat(messages, opts)
+    if (typeof result === 'string') {
+      text = result
+    } else if (result && typeof result === 'object') {
+      // Puter may return { message: { content: string } } or { text: string }
+      const resObj = result as { text?: string; message?: { content?: string } }
+      text = resObj.text || resObj.message?.content || JSON.stringify(result)
+    }
+  } catch (chatErr) {
+    console.warn('Puter vision chat error, trying alternative model:', chatErr)
+    try {
+      const fallbackResult = await puter.ai.chat(messages, { model: PUTER_MODELS.GPT_4O })
+      text = typeof fallbackResult === 'string' ? fallbackResult : JSON.stringify(fallbackResult)
+    } catch {
+      return null
+    }
+  }
 
   try {
-    const match = text.match(/\{[\s\S]*\}/)
-    if (match) return JSON.parse(match[0])
-  } catch {
-    // fall through
+    // Strip markdown fences if present
+    const cleanText = text.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim()
+    const match = cleanText.match(/\{[\s\S]*\}/)
+    if (match) {
+      const parsed = JSON.parse(match[0])
+      if (parsed && Array.isArray(parsed.foods) && parsed.foods.length > 0) {
+        const totalCalories = parsed.totalCalories || parsed.foods.reduce((sum: number, f: { calories?: number }) => sum + (Number(f.calories) || 0), 0)
+        return {
+          ...parsed,
+          totalCalories: Math.round(totalCalories),
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to parse Puter food analysis JSON:', err, text)
   }
   return null
 }

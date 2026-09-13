@@ -21,6 +21,7 @@ export interface NutritionState {
   dailyCalories: number
   targetMacros: { protein: number; carbs: number; fat: number }
   waterTarget: number // liters
+  goalMode: 'cut' | 'maintain' | 'bulk'
 
   // Preferences
   foodBudget: 'low' | 'medium' | 'flexible'
@@ -50,6 +51,8 @@ export interface NutritionState {
   foodLibraryModalOpen: boolean
 
   // Actions
+  setGoalMode: (mode: 'cut' | 'maintain' | 'bulk') => void
+  setCustomTargets: (targets: { calories?: number; protein?: number; carbs?: number; fat?: number; waterTarget?: number }) => void
   toggleMealEaten: (index: number) => void
   addMealFood: (mealIndex: number, food: MealFood) => void
   addNewMeal: (meal: Meal) => void
@@ -128,11 +131,51 @@ const DEFAULT_GROCERY_ITEMS: GroceryItem[] = [
 ]
 
 export const useNutritionStore = create<NutritionState>((set, get) => ({
-  dailyCalories: 2850,
-  targetMacros: { protein: 185, carbs: 310, fat: 82 },
-  waterTarget: 3.5,
+  dailyCalories: 2450,
+  targetMacros: { protein: 180, carbs: 240, fat: 70 },
+  waterTarget: 3.0,
+  goalMode: 'maintain',
   foodBudget: 'medium',
   algerianFoodPreferred: true,
+
+  setGoalMode: (mode) => {
+    set(() => {
+      if (mode === 'cut') {
+        return {
+          goalMode: 'cut',
+          dailyCalories: 1950,
+          targetMacros: { protein: 190, carbs: 165, fat: 58 },
+          waterTarget: 3.2,
+        }
+      }
+      if (mode === 'bulk') {
+        return {
+          goalMode: 'bulk',
+          dailyCalories: 2950,
+          targetMacros: { protein: 200, carbs: 360, fat: 85 },
+          waterTarget: 3.5,
+        }
+      }
+      return {
+        goalMode: 'maintain',
+        dailyCalories: 2450,
+        targetMacros: { protein: 180, carbs: 240, fat: 70 },
+        waterTarget: 3.0,
+      }
+    })
+  },
+
+  setCustomTargets: (targets) => {
+    set((state) => ({
+      dailyCalories: targets.calories ?? state.dailyCalories,
+      targetMacros: {
+        protein: targets.protein ?? state.targetMacros.protein,
+        carbs: targets.carbs ?? state.targetMacros.carbs,
+        fat: targets.fat ?? state.targetMacros.fat,
+      },
+      waterTarget: targets.waterTarget ?? state.waterTarget,
+    }))
+  },
 
   todayWorkout: {
     name: 'Legs & Glutes 🔥',

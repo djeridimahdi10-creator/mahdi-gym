@@ -1,7 +1,11 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import Link from 'next/link'
+import { Sparkles, Check, ArrowRight, Eye } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge'
 
 interface InteractiveStepCardProps {
   stepNumber: string
@@ -12,6 +16,7 @@ interface InteractiveStepCardProps {
   tagColor: 'emerald' | 'indigo' | 'coral' | 'amber'
   svgComponent: React.ReactNode
   visualizerComponent: React.ReactNode
+  keyHighlights: string[]
   isReversed?: boolean
 }
 
@@ -24,112 +29,154 @@ export function InteractiveStepCard({
   tagColor,
   svgComponent,
   visualizerComponent,
+  keyHighlights,
   isReversed = false,
 }: InteractiveStepCardProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'interactive'>('interactive')
+  const [activeTab, setActiveTab] = useState<'interactive' | 'overview'>('interactive')
 
   const colorStyles = {
     emerald: {
-      tagBg: 'bg-primary-500/10 border-primary-400/20 text-primary-300',
-      glow: 'group-hover:shadow-[0_0_50px_rgba(16,185,129,0.15)]',
-      borderHover: 'group-hover:border-primary-500/40',
-      badgeBg: 'from-primary-500 to-primary-400',
+      tagVariant: 'primary' as const,
+      glow: 'hover:shadow-[0_0_50px_rgba(16,185,129,0.18)]',
+      borderHover: 'hover:border-primary-500/40',
+      badgeBg: 'from-emerald-400 to-teal-500 text-dark-950',
     },
     indigo: {
-      tagBg: 'bg-ai-400/10 border-ai-400/20 text-ai-300',
-      glow: 'group-hover:shadow-[0_0_50px_rgba(99,102,241,0.15)]',
-      borderHover: 'group-hover:border-ai-400/40',
-      badgeBg: 'from-ai-500 to-ai-400',
+      tagVariant: 'ai' as const,
+      glow: 'hover:shadow-[0_0_50px_rgba(168,85,247,0.18)]',
+      borderHover: 'hover:border-ai-400/40',
+      badgeBg: 'from-ai-400 to-purple-600 text-white',
     },
     coral: {
-      tagBg: 'bg-coral-400/10 border-coral-400/20 text-coral-300',
-      glow: 'group-hover:shadow-[0_0_50px_rgba(244,63,94,0.15)]',
-      borderHover: 'group-hover:border-coral-400/40',
-      badgeBg: 'from-coral-500 to-coral-400',
+      tagVariant: 'coral' as const,
+      glow: 'hover:shadow-[0_0_50px_rgba(244,63,94,0.18)]',
+      borderHover: 'hover:border-coral-400/40',
+      badgeBg: 'from-coral-400 to-rose-600 text-white',
     },
     amber: {
-      tagBg: 'bg-energy-400/10 border-energy-300/20 text-energy-300',
-      glow: 'group-hover:shadow-[0_0_50px_rgba(245,158,11,0.15)]',
-      borderHover: 'group-hover:border-energy-300/40',
-      badgeBg: 'from-energy-500 to-energy-400',
+      tagVariant: 'energy' as const,
+      glow: 'hover:shadow-[0_0_50px_rgba(245,158,11,0.18)]',
+      borderHover: 'hover:border-energy-300/40',
+      badgeBg: 'from-energy-400 to-amber-600 text-dark-950',
     },
   }[tagColor]
 
   return (
-    <div
+    <Card
       id={`step-${stepNumber}`}
-      className={`group relative rounded-3xl bg-dark-900/60 backdrop-blur-xl border border-white/10 p-6 sm:p-8 lg:p-10 transition-all duration-500 hover:-translate-y-1.5 ${colorStyles.glow} ${colorStyles.borderHover}`}
+      variant="hover"
+      className={`group relative p-6 sm:p-8 lg:p-10 transition-all duration-500 ${colorStyles.glow} ${colorStyles.borderHover}`}
     >
-      {/* Background Subtle Gradient Mesh */}
-      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
+      {/* Background subtle gradient mesh */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
 
-      {/* Step Header info */}
+      {/* Step Header bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-3">
-          <span className={`w-10 h-10 rounded-2xl bg-gradient-to-br ${colorStyles.badgeBg} flex items-center justify-center text-white font-display font-bold text-sm shadow-lg`}>
+          <span
+            className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${colorStyles.badgeBg} flex items-center justify-center font-display font-extrabold text-base shadow-lg`}
+          >
             {stepNumber}
           </span>
-          <span className={`px-3.5 py-1.5 rounded-full border text-xs font-semibold uppercase tracking-wider ${colorStyles.tagBg}`}>
-            {tag}
-          </span>
+          <div>
+            <div className="text-[10px] font-mono text-dark-400 uppercase tracking-widest">{subtitle}</div>
+            <div className="mt-0.5">
+              <Badge variant={colorStyles.tagVariant} size="sm">
+                {tag}
+              </Badge>
+            </div>
+          </div>
         </div>
 
-        {/* Tab Toggle: Visual illustration vs Live Demo */}
-        <div className="bg-dark-950/80 p-1 rounded-xl border border-white/10 flex items-center gap-1">
-          <button
+        {/* Tab Switcher using shadcn Button components */}
+        <div className="bg-dark-950/90 p-1 rounded-xl border border-white/10 flex items-center gap-1">
+          <Button
+            type="button"
+            variant={activeTab === 'interactive' ? 'secondary' : 'ghost'}
+            size="xs"
             onClick={() => setActiveTab('interactive')}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'interactive'
-                ? 'bg-white/10 text-white shadow'
-                : 'text-dark-400 hover:text-white'
-            }`}
+            className="text-xs"
           >
-            ⚡ Try Demo
-          </button>
-          <button
+            <Sparkles className="w-3.5 h-3.5 text-primary-400" />
+            <span>Interactive Demo</span>
+          </Button>
+          <Button
+            type="button"
+            variant={activeTab === 'overview' ? 'secondary' : 'ghost'}
+            size="xs"
             onClick={() => setActiveTab('overview')}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'overview'
-                ? 'bg-white/10 text-white shadow'
-                : 'text-dark-400 hover:text-white'
-            }`}
+            className="text-xs"
           >
-            🖼️ Graphic View
-          </button>
+            <Eye className="w-3.5 h-3.5 text-ai-400" />
+            <span>Graphic View</span>
+          </Button>
         </div>
       </div>
 
-      {/* Grid Layout (Reversible on alternating steps) */}
-      <div className={`grid lg:grid-cols-12 gap-8 items-center ${isReversed ? 'lg:flex-row-reverse' : ''}`}>
-        {/* Left Side: Text Storytelling (Spans 5 cols) */}
-        <div className={`lg:col-span-5 space-y-4 ${isReversed ? 'lg:order-2' : 'lg:order-1'}`}>
-          <div className="text-xs font-bold uppercase tracking-wider text-dark-400">{subtitle}</div>
-          <h3 className="text-2xl sm:text-3xl font-display font-bold text-white leading-tight">
+      {/* Grid Layout (5 cols text, 7 cols visualizer) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        {/* Storytelling Column */}
+        <div
+          className={`space-y-5 ${
+            isReversed ? 'lg:col-span-5 lg:order-2' : 'lg:col-span-5 lg:order-1'
+          }`}
+        >
+          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-display font-extrabold text-white tracking-tight leading-tight">
             {title}
           </h3>
+
           <p className="text-dark-300 text-sm sm:text-base leading-relaxed">
             {description}
           </p>
 
-          <div className="pt-2 flex items-center gap-2 text-xs text-dark-400">
-            <Sparkles className="w-4 h-4 text-primary-400" />
-            <span>Interactive real-time preview powered by NutriSaaS Engine</span>
+          {/* Key Feature Highlights Checklist */}
+          <div className="space-y-2 pt-2">
+            <div className="text-xs font-bold text-white uppercase tracking-wider">
+              Core Capabilities
+            </div>
+            {keyHighlights.map((highlight, idx) => (
+              <div key={idx} className="flex items-start gap-2.5 text-xs text-dark-200">
+                <div className="w-4 h-4 rounded-full bg-primary-500/20 border border-primary-400/30 flex items-center justify-center text-primary-300 flex-shrink-0 mt-0.5">
+                  <Check className="w-2.5 h-2.5" />
+                </div>
+                <span>{highlight}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Action link using shadcn Button */}
+          <div className="pt-2">
+            <Link href="/signup">
+              <Button variant="outline" size="sm" className="gap-2 text-xs font-bold text-primary-300 hover:text-white">
+                <span>Try this step in your free trial</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </Link>
           </div>
         </div>
 
-        {/* Right Side: Visualizer or SVG Illustration (Spans 7 cols) */}
-        <div className={`lg:col-span-7 ${isReversed ? 'lg:order-1' : 'lg:order-2'}`}>
-          <div className="bg-dark-950/90 rounded-2xl border border-white/10 p-5 sm:p-6 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
+        {/* Visualizer / Illustration Column */}
+        <div
+          className={`${
+            isReversed ? 'lg:col-span-7 lg:order-1' : 'lg:col-span-7 lg:order-2'
+          }`}
+        >
+          <Card
+            variant="static"
+            className="bg-dark-950/95 border-white/10 p-5 sm:p-7 shadow-2xl relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
 
             {activeTab === 'interactive' ? (
               <div className="animate-fade-in">{visualizerComponent}</div>
             ) : (
-              <div className="animate-fade-in">{svgComponent}</div>
+              <div className="animate-fade-in py-6 flex items-center justify-center">
+                {svgComponent}
+              </div>
             )}
-          </div>
+          </Card>
         </div>
       </div>
-    </div>
+    </Card>
   )
 }

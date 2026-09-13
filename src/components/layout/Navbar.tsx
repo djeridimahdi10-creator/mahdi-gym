@@ -1,177 +1,299 @@
 'use client'
 
-import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui'
-import { Zap, Menu, X, Sparkles, ArrowRight } from 'lucide-react'
+import { Zap, Menu, X, ArrowRight, LayoutDashboard, Globe } from 'lucide-react'
 
-const navLinks = [
-  { href: '/#features',    label: 'Features' },
-  { href: '/how-it-works', label: 'How It Works' },
-  { href: '/#pricing',     label: 'Pricing' },
-]
+interface NavbarProps {
+  activeSection?: string
+  lang?: 'EN' | 'DZ'
+  onLangChange?: (lang: 'EN' | 'DZ') => void
+  showLangToggle?: boolean
+}
 
-export function Navbar() {
+export function Navbar({
+  activeSection: externalActiveSection,
+  lang: externalLang,
+  onLangChange,
+  showLangToggle = true,
+}: NavbarProps = {}) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [internalLang, setInternalLang] = useState<'EN' | 'DZ'>('EN')
+  const [internalActiveSection, setInternalActiveSection] = useState('')
   const { user } = useAuthStore()
+  const pathname = usePathname()
 
+  const currentLang = externalLang ?? internalLang
+  const handleLangToggle = (newLang: 'EN' | 'DZ') => {
+    if (onLangChange) {
+      onLangChange(newLang)
+    } else {
+      setInternalLang(newLang)
+    }
+  }
+
+  // Scroll listener for glass elevation
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20)
+    }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? 'py-2'
-          : 'py-4 bg-transparent'
-      }`}
-      style={
-        scrolled
-          ? {
-              background: 'rgba(4,8,18,0.92)',
-              backdropFilter: 'blur(28px) saturate(200%)',
-              WebkitBackdropFilter: 'blur(28px) saturate(200%)',
-              borderBottom: '1px solid rgba(255,255,255,0.05)',
-              boxShadow: '0 4px 30px rgba(0,0,0,0.4)',
-            }
-          : {}
-      }
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4">
+  // Section spy if externalActiveSection is not provided
+  useEffect(() => {
+    if (externalActiveSection !== undefined || pathname !== '/') return
+    const ids = ['features', 'how-it-works', 'faq']
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setInternalActiveSection(entry.target.id)
+        })
+      },
+      { rootMargin: '-45% 0px -50% 0px' }
+    )
+    ids.forEach((id) => {
+      const el = document.getElementById(id)
+      if (el) observer.observe(el)
+    })
+    return () => observer.disconnect()
+  }, [externalActiveSection, pathname])
 
-          {/* ── Logo ── */}
+  const activeSection = externalActiveSection ?? internalActiveSection
+
+  const navLinks = [
+    { href: '/#features', id: 'features', label: 'Features' },
+    { href: '/how-it-works', id: 'how-it-works', label: 'How It Works' },
+    { href: '/#faq', id: 'faq', label: 'FAQ' },
+  ]
+
+  return (
+    <header className="fixed top-3.5 sm:top-5 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] max-w-6xl transition-all duration-300">
+      <div
+        className={`rounded-2xl sm:rounded-full px-4 sm:px-6 py-2.5 sm:py-3 transition-all duration-500 ${
+          scrolled ? 'glass-dock-scrolled' : 'glass-dock'
+        }`}
+      >
+        <div className="flex items-center justify-between gap-4 sm:gap-8">
+          
+          {/* ── Brand Logo ── */}
           <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-            <div
-              className={`rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-105 ${
-                scrolled ? 'w-9 h-9' : 'w-10 h-10'
-              }`}
-              style={{
-                background: 'linear-gradient(135deg, #10b981, #059669)',
-                boxShadow: '0 0 20px rgba(16,185,129,0.4)',
-              }}
-            >
-              <Zap className={`text-white fill-white transition-all duration-300 ${scrolled ? 'w-4 h-4' : 'w-5 h-5'}`} />
+            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-400 via-primary-500 to-teal-600 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.35)] group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all duration-300">
+              <div className="absolute inset-[1px] rounded-[11px] sm:rounded-[15px] bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+              <Zap className="w-5 h-5 text-dark-950 fill-dark-950 stroke-[2.2] group-hover:rotate-6 transition-transform duration-300" />
             </div>
-            <span
-              className="font-bold text-lg text-white tracking-tight"
-              style={{ fontFamily: 'Space Grotesk, sans-serif' }}
-            >
-              NutriSaaS
-            </span>
-            {/* Beta badge */}
-            <span
-              className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold tracking-widest uppercase"
-              style={{
-                background: 'rgba(52,211,153,0.1)',
-                border: '1px solid rgba(52,211,153,0.2)',
-                color: '#34d399',
-              }}
-            >
-              <Sparkles className="w-2.5 h-2.5" />
-              AI Beta
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-display font-extrabold text-lg sm:text-xl text-white tracking-tight leading-none group-hover:text-primary-300 transition-colors">
+                NutriSaaS<span className="text-primary-400">AI</span>
+              </span>
+              <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 shadow-[0_0_10px_rgba(52,211,153,0.15)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                AI 2.0
+              </span>
+            </div>
           </Link>
 
-          {/* ── Desktop Nav ── */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="relative px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors duration-250 group rounded-xl"
-              >
-                {link.label}
-                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-primary-400 to-primary-300 rounded-full transition-all duration-300 group-hover:w-3/4" />
-              </Link>
-            ))}
+          {/* ── Desktop Navigation Links ── */}
+          <nav className="hidden md:flex items-center gap-1 bg-white/[0.03] p-1.5 rounded-full border border-white/[0.08] shadow-[inset_0_1px_1px_rgba(0,0,0,0.4)]">
+            {navLinks.map((link) => {
+              const isSectionActive = pathname === '/' && activeSection === link.id
+              const isPathActive = pathname === link.href
+              const isActive = isSectionActive || isPathActive
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`relative text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full transition-all duration-200 ${
+                    isActive
+                      ? 'text-white bg-emerald-500/15 border border-emerald-400/35 shadow-[0_0_15px_rgba(52,211,153,0.2)]'
+                      : 'text-dark-300 hover:text-white hover:bg-white/[0.06] border border-transparent'
+                  }`}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-2 h-0.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]" />
+                  )}
+                </Link>
+              )
+            })}
           </nav>
 
-          {/* ── Auth CTA ── */}
-          <div className="hidden md:flex items-center gap-2.5">
+          {/* ── Desktop Actions (Language & Auth) ── */}
+          <div className="hidden md:flex items-center gap-3 flex-shrink-0">
+            {/* Language Switcher */}
+            {showLangToggle && (
+              <div className="flex items-center p-1 rounded-full bg-white/[0.04] border border-white/10 shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => handleLangToggle('DZ')}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                    currentLang === 'DZ'
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-dark-950 font-extrabold shadow-[0_0_12px_rgba(52,211,153,0.3)]'
+                      : 'text-dark-400 hover:text-white'
+                  }`}
+                >
+                  <span className="text-[11px]">🇩🇿</span> DZ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleLangToggle('EN')}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                    currentLang === 'EN'
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-dark-950 font-extrabold shadow-[0_0_12px_rgba(52,211,153,0.3)]'
+                      : 'text-dark-400 hover:text-white'
+                  }`}
+                >
+                  <span className="text-[11px]">🇬🇧</span> EN
+                </button>
+              </div>
+            )}
+
+            {/* Auth Buttons */}
             {user ? (
               <Link href="/dashboard">
-                <Button variant="primary" size="sm" glow className="gap-2">
-                  Dashboard <ArrowRight className="w-3.5 h-3.5" />
+                <Button
+                  variant="primary"
+                  size="sm"
+                  glow
+                  className="rounded-full gap-2 px-5 text-xs font-bold shadow-[0_0_20px_rgba(16,185,129,0.35)]"
+                >
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  Dashboard
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Button>
               </Link>
             ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">Sign In</Button>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  className="text-xs font-bold text-dark-300 hover:text-white transition-colors px-3 py-1.5 rounded-full hover:bg-white/[0.06]"
+                >
+                  Sign In
                 </Link>
                 <Link href="/signup">
-                  <Button variant="primary" size="sm" glow className="gap-2">
-                    Get Started <ArrowRight className="w-3.5 h-3.5" />
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    glow
+                    className="rounded-full text-xs font-extrabold px-5 py-2 text-dark-950 bg-gradient-to-r from-emerald-400 via-primary-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 shadow-[0_0_25px_rgba(16,185,129,0.35)] hover:shadow-[0_0_35px_rgba(52,211,153,0.5)] border-none transition-all duration-300"
+                  >
+                    <span>Get Started</span>
+                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
                   </Button>
                 </Link>
-              </>
+              </div>
             )}
           </div>
 
-          {/* ── Mobile Toggle ── */}
+          {/* ── Mobile Menu Toggle Button ── */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 hover:bg-white/[0.07]"
-            style={{ border: '1px solid rgba(255,255,255,0.08)' }}
+            className="md:hidden w-9 h-9 flex items-center justify-center rounded-full bg-white/[0.05] border border-white/10 text-dark-300 hover:text-white hover:bg-white/[0.09] transition-all cursor-pointer shadow-sm active:scale-95"
             aria-label="Toggle menu"
           >
-            <div className="relative w-5 h-5">
-              <Menu className={`w-5 h-5 absolute inset-0 text-slate-400 transition-all duration-300 ${mobileOpen ? 'opacity-0 rotate-90' : 'opacity-100 rotate-0'}`} />
-              <X    className={`w-5 h-5 absolute inset-0 text-slate-400 transition-all duration-300 ${mobileOpen ? 'opacity-100 rotate-0' : 'opacity-0 -rotate-90'}`} />
-            </div>
+            {mobileOpen ? <X className="w-4.5 h-4.5" /> : <Menu className="w-4.5 h-4.5" />}
           </button>
         </div>
       </div>
 
-      {/* ── Mobile Dropdown ── */}
-      <div
-        className={`md:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          mobileOpen ? 'max-h-[420px] opacity-100' : 'max-h-0 opacity-0'
-        }`}
-        style={{
-          background: 'rgba(4,8,18,0.98)',
-          backdropFilter: 'blur(28px)',
-          WebkitBackdropFilter: 'blur(28px)',
-        }}
-      >
-        <div className="px-4 py-5 space-y-1.5 border-t border-white/[0.05]">
-          {navLinks.map((link, i) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-between px-4 py-3 text-sm font-medium text-slate-300 hover:text-white rounded-2xl hover:bg-white/[0.05] transition-all duration-200 animate-slide-up"
-              style={{ animationDelay: `${i * 0.05}s` }}
-            >
-              {link.label}
-              <ArrowRight className="w-3.5 h-3.5 text-slate-600" />
-            </Link>
-          ))}
-
-          <div className="pt-3 border-t border-white/[0.05] space-y-2">
-            {user ? (
-              <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
-                <Button variant="primary" className="w-full" glow>Dashboard</Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login" onClick={() => setMobileOpen(false)}>
-                  <Button variant="ghost" className="w-full">Sign In</Button>
-                </Link>
-                <Link href="/signup" onClick={() => setMobileOpen(false)}>
-                  <Button variant="primary" className="w-full" glow>Get Started Free</Button>
-                </Link>
-              </>
+      {/* ── Mobile Dropdown Drawer ── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: -10 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="md:hidden mt-3 overflow-hidden glass-dock-scrolled rounded-3xl p-5 shadow-2xl space-y-4"
+          >
+            {/* Mobile Language Switcher */}
+            {showLangToggle && (
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <span className="text-xs font-bold text-dark-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5 text-primary-400" />
+                  Language
+                </span>
+                <div className="flex items-center p-1 rounded-full bg-white/[0.05] border border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => handleLangToggle('DZ')}
+                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                      currentLang === 'DZ'
+                        ? 'bg-primary-400 text-dark-950 font-extrabold shadow-sm'
+                        : 'text-dark-300'
+                    }`}
+                  >
+                    🇩🇿 DZ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleLangToggle('EN')}
+                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                      currentLang === 'EN'
+                        ? 'bg-primary-400 text-dark-950 font-extrabold shadow-sm'
+                        : 'text-dark-300'
+                    }`}
+                  >
+                    🇬🇧 EN
+                  </button>
+                </div>
+              </div>
             )}
-          </div>
-        </div>
-      </div>
+
+            {/* Mobile Navigation Links */}
+            <div className="space-y-1">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-dark-200 hover:text-white hover:bg-white/[0.06] rounded-xl transition-all"
+                >
+                  <span>{link.label}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-dark-500" />
+                </Link>
+              ))}
+            </div>
+
+            {/* Mobile CTA Area */}
+            <div className="pt-3 border-t border-white/10 flex flex-col gap-2.5">
+              {user ? (
+                <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
+                  <Button variant="primary" className="w-full justify-center text-sm py-3 rounded-xl" glow>
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                    Open Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/login" onClick={() => setMobileOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-center text-sm py-2.5 rounded-xl border border-white/10">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/signup" onClick={() => setMobileOpen(false)}>
+                    <Button
+                      variant="primary"
+                      className="w-full justify-center bg-gradient-to-r from-emerald-400 to-teal-400 text-dark-950 font-extrabold text-sm py-3 rounded-xl shadow-lg shadow-emerald-500/20"
+                    >
+                      Get Started Free
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }
+
+export default Navbar

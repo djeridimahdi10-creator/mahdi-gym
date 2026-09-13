@@ -1,107 +1,72 @@
-'use client'
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/lib/utils"
+import { Loader2 } from "lucide-react"
 
-import { cn } from '@/lib/utils'
-import { Loader2 } from 'lucide-react'
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] cursor-pointer select-none",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-gradient-to-r from-emerald-500 via-primary-500 to-teal-500 text-dark-950 font-bold hover:from-emerald-400 hover:to-teal-400 shadow-[0_0_20px_rgba(16,185,129,0.35)] hover:shadow-[0_0_30px_rgba(52,211,153,0.5)] border-none",
+        primary:
+          "bg-gradient-to-r from-emerald-500 via-primary-500 to-teal-500 text-dark-950 font-bold hover:from-emerald-400 hover:to-teal-400 shadow-[0_0_20px_rgba(16,185,129,0.35)] hover:shadow-[0_0_30px_rgba(52,211,153,0.5)] border-none",
+        secondary:
+          "bg-dark-800 text-dark-100 hover:bg-dark-700 hover:text-white border border-white/10",
+        destructive:
+          "bg-red-500/15 text-red-300 hover:bg-red-500/25 border border-red-500/30",
+        danger:
+          "bg-red-500/15 text-red-300 hover:bg-red-500/25 border border-red-500/30",
+        outline:
+          "border border-white/15 bg-transparent text-dark-200 hover:bg-white/[0.06] hover:text-white hover:border-white/30",
+        ghost:
+          "text-dark-300 hover:bg-white/[0.08] hover:text-white border border-transparent",
+        link: "text-primary-400 underline-offset-4 hover:underline",
+        energy:
+          "bg-gradient-to-r from-energy-500 via-energy-400 to-amber-500 text-dark-950 font-bold hover:brightness-110 shadow-[0_0_20px_rgba(249,115,22,0.35)]",
+        ai:
+          "bg-gradient-to-r from-ai-500 via-ai-600 to-purple-600 text-white font-bold hover:brightness-110 shadow-[0_0_20px_rgba(168,85,247,0.35)]",
+      },
+      size: {
+        default: "h-10 px-4 py-2 text-xs",
+        xs: "h-7 px-2.5 text-[11px] rounded-lg",
+        sm: "h-8 px-3 text-xs rounded-lg",
+        md: "h-10 px-5 text-xs rounded-xl",
+        lg: "h-12 px-8 text-sm rounded-2xl font-bold",
+        icon: "h-9 w-9 p-0 rounded-xl",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'energy' | 'ghost' | 'danger' | 'ai' | 'outline'
-  size?: 'sm' | 'md' | 'lg' | 'icon'
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
   loading?: boolean
   glow?: boolean
-  children: React.ReactNode
 }
 
-export function Button({
-  variant = 'primary',
-  size = 'md',
-  loading = false,
-  glow = false,
-  className,
-  children,
-  disabled,
-  ...props
-}: ButtonProps) {
-  const baseStyles = [
-    'inline-flex items-center justify-center gap-2 font-semibold rounded-2xl',
-    'transition-all duration-300 ease-out',
-    'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none',
-    'active:scale-[0.97] active:transition-[transform] active:duration-100',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400',
-    'cursor-pointer relative overflow-hidden',
-  ].join(' ')
-
-  const variants = {
-    primary: [
-      'bg-gradient-to-r from-primary-500 to-primary-400 text-white',
-      'hover:shadow-[0_8px_30px_rgba(16,185,129,0.35),0_0_60px_rgba(52,211,153,0.12)]',
-      'hover:-translate-y-1 hover:brightness-110',
-      'border border-primary-400/20',
-    ].join(' '),
-    energy: [
-      'bg-gradient-to-r from-energy-400 to-energy-300 text-white',
-      'hover:shadow-[0_8px_30px_rgba(249,115,22,0.35),0_0_60px_rgba(251,146,60,0.12)]',
-      'hover:-translate-y-1 hover:brightness-110',
-      'border border-energy-300/20',
-    ].join(' '),
-    ghost: [
-      'bg-transparent text-dark-300',
-      'border border-white/[0.09]',
-      'hover:bg-white/[0.06] hover:border-white/[0.18] hover:text-white',
-      'hover:-translate-y-0.5',
-      'hover:shadow-[0_4px_20px_rgba(0,0,0,0.2)]',
-    ].join(' '),
-    outline: [
-      'bg-transparent text-primary-300',
-      'border border-primary-400/30',
-      'hover:bg-primary-500/10 hover:border-primary-400/50 hover:text-primary-200',
-      'hover:-translate-y-0.5',
-      'hover:shadow-[0_0_20px_rgba(52,211,153,0.15)]',
-    ].join(' '),
-    danger: [
-      'bg-red-500/10 text-red-400',
-      'border border-red-500/20',
-      'hover:bg-red-500/20 hover:border-red-500/30',
-      'hover:shadow-[0_4px_20px_rgba(239,68,68,0.15)]',
-    ].join(' '),
-    ai: [
-      'bg-gradient-to-r from-ai-500 to-ai-400 text-white',
-      'hover:shadow-[0_8px_30px_rgba(168,85,247,0.35),0_0_60px_rgba(168,85,247,0.12)]',
-      'hover:-translate-y-1 hover:brightness-110',
-      'border border-ai-400/20',
-    ].join(' '),
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, loading, glow, children, disabled, ...props }, ref) => {
+    return (
+      <button
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        disabled={disabled || loading}
+        {...props}
+      >
+        {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+        {children}
+      </button>
+    )
   }
+)
+Button.displayName = "Button"
 
-  const glowVariants = {
-    primary: 'shadow-[0_0_20px_rgba(52,211,153,0.25)]',
-    energy: 'shadow-[0_0_20px_rgba(249,115,22,0.25)]',
-    ghost: '',
-    outline: '',
-    danger: '',
-    ai: 'shadow-[0_0_20px_rgba(168,85,247,0.25)]',
-  }
-
-  const sizes = {
-    sm: 'px-4 py-2 text-xs',
-    md: 'px-6 py-3 text-sm',
-    lg: 'px-8 py-4 text-base',
-    icon: 'p-2.5 text-sm',
-  }
-
-  return (
-    <button
-      className={cn(
-        baseStyles,
-        variants[variant],
-        sizes[size],
-        glow ? glowVariants[variant] : '',
-        'btn-shine',
-        className
-      )}
-      disabled={disabled || loading}
-      {...props}
-    >
-      {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-      {children}
-    </button>
-  )
-}
+export { Button, buttonVariants }

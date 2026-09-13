@@ -1,62 +1,100 @@
 'use client'
 
+import React from 'react'
 import Link from 'next/link'
-import { Zap, Camera, ChevronRight } from 'lucide-react'
+import Image from 'next/image'
+import { Camera, Plus, Sparkles } from 'lucide-react'
+import { ScanTargetVisualSVG } from './DashboardVisuals'
 
-export function RecommendedActionCard() {
+interface RecommendedActionCardProps {
+  onOpenQuickLog?: () => void
+}
+
+export function RecommendedActionCard({ onOpenQuickLog }: RecommendedActionCardProps) {
   return (
     <div
-      className="p-6 rounded-2xl relative overflow-hidden flex flex-col justify-between h-full space-y-4"
+      className="p-5 rounded-2xl relative overflow-hidden flex flex-col h-full"
       style={{
         background: 'rgba(11, 17, 31, 0.85)',
         border: '1px solid rgba(255, 255, 255, 0.08)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.25)',
       }}
     >
-      {/* Title Header */}
-      <div className="flex items-center gap-2.5">
-        <div className="w-7 h-7 rounded-xl bg-rose-500/20 flex items-center justify-center text-rose-400">
-          <Zap className="w-4 h-4 fill-rose-400" />
-        </div>
-        <h3 className="text-base font-bold text-white tracking-wide">Recommended Action</h3>
-      </div>
-
-      {/* Main Gradient Banner */}
-      <div
-        className="p-6 sm:p-7 rounded-2xl relative overflow-hidden flex flex-col justify-between gap-6 flex-1"
-        style={{
-          background: 'linear-gradient(135deg, #e11d48 0%, #f97316 100%)',
-          boxShadow: '0 10px 36px rgba(225, 29, 72, 0.35)',
-        }}
-      >
-        {/* Decorative Background Glow Circle */}
-        <div
-          className="absolute -right-10 -bottom-10 w-48 h-48 rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%)' }}
-        />
-
-        {/* Camera Icon & Message */}
-        <div className="flex items-center gap-5 relative z-10">
-          <div className="w-16 h-16 rounded-full bg-white/20 border border-white/30 backdrop-blur-md flex items-center justify-center flex-shrink-0 shadow-xl">
-            <Camera className="w-8 h-8 text-white" />
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/25 flex items-center justify-center">
+            <Camera className="w-4.5 h-4.5 text-rose-400" />
           </div>
           <div>
-            <h4 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              Scan your meal
-            </h4>
-            <p className="text-xs sm:text-sm text-white/95 font-medium mt-1 leading-snug">
-              You&apos;re 680 kcal away from your daily goal.
-            </p>
+            <h3 className="text-base font-bold text-white tracking-wide">Food Scanner</h3>
+            <p className="text-[11px] text-rose-400 font-semibold mt-0.5">AI meal recognition</p>
           </div>
         </div>
 
-        {/* CTA Button */}
-        <Link href="/dashboard/scan" className="relative z-10 self-end w-full sm:w-auto">
-          <button className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-white text-slate-950 hover:bg-slate-100 font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-2xl hover:scale-105 transition-all duration-200">
-            <span>Scan Meal Now</span>
-            <ChevronRight className="w-4 h-4 stroke-[3]" />
-          </button>
-        </Link>
+        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/25">
+          Smart Vision
+        </span>
+      </div>
+
+      {/* Scanner Banner */}
+      <div className="relative rounded-2xl overflow-hidden min-h-[180px] flex flex-col justify-between p-4 group border border-white/[0.08] flex-1">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/dashboard-macro-bowl.jpg"
+            alt="Healthy Gourmet Macro Bowl"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-700 brightness-[0.65] saturate-[1.1]"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/40 to-dark-950/20" />
+        </div>
+
+        {/* Scanner Crosshair */}
+        <div className="absolute inset-0 pointer-events-none z-10 opacity-60 group-hover:opacity-100 transition-opacity">
+          <ScanTargetVisualSVG />
+        </div>
+
+        {/* Top Tag */}
+        <div className="relative z-20 flex items-center justify-between">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-dark-900/80 backdrop-blur-md border border-emerald-500/25 text-[10px] font-bold text-emerald-300">
+            <Sparkles className="w-3 h-3 text-emerald-400" />
+            98.4% Accuracy
+          </span>
+        </div>
+
+        {/* Bottom Details */}
+        <div className="relative z-20 space-y-3 mt-auto pt-4">
+          <div>
+            <h4 className="text-sm font-bold text-white tracking-tight leading-snug">
+              Snap your next meal
+            </h4>
+            <p className="text-[11px] text-slate-200/80 font-medium mt-1">
+              AI detects ingredients, calories, protein & fats in seconds.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard/scan" className="flex-1">
+              <button className="w-full py-2.5 px-3 rounded-xl bg-white text-slate-950 hover:bg-slate-100 font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg hover:scale-[1.02] transition-all duration-200">
+                <Camera className="w-3.5 h-3.5 text-rose-500" />
+                <span>Open Scanner</span>
+              </button>
+            </Link>
+
+            {onOpenQuickLog && (
+              <button
+                onClick={onOpenQuickLog}
+                className="py-2.5 px-3 rounded-xl bg-dark-900/80 hover:bg-dark-900 text-white font-bold text-xs border border-white/15 backdrop-blur-md hover:border-white/30 transition-all duration-200 flex items-center gap-1"
+                title="Quick manual entry"
+              >
+                <Plus className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Log</span>
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

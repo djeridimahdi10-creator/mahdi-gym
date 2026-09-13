@@ -30,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} h-full`}>
+    <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${spaceGrotesk.variable} h-full`}>
       <head>
         <meta name="theme-color" content="#080f1e" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />

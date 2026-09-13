@@ -1,15 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
-import { useUIStore } from '@/stores/uiStore'
 import { Sidebar, MobileHeader } from '@/components/layout'
+import { SidebarProvider, SidebarInset } from '@/components/ui'
 import { Zap } from 'lucide-react'
-
-// These must match the width values in Sidebar.tsx
-const SIDEBAR_OPEN_W  = 264  // px — matches 'w-[264px]' in Sidebar
-const SIDEBAR_MINI_W  =  76  // px — matches 'md:w-[76px]' in Sidebar
 
 export default function DashboardLayout({
   children,
@@ -18,19 +14,6 @@ export default function DashboardLayout({
 }) {
   const router = useRouter()
   const { user, loading, fetchProfile } = useAuthStore()
-  const { sidebarOpen } = useUIStore()
-
-  // Track whether we're on a desktop viewport so we can decide whether to
-  // apply the left-padding offset. On mobile the sidebar is off-canvas.
-  const [isDesktop, setIsDesktop] = useState(false)
-
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)')
-    setIsDesktop(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
 
   useEffect(() => {
     fetchProfile()
@@ -62,7 +45,7 @@ export default function DashboardLayout({
           >
             <Zap className="w-10 h-10 text-white fill-white" />
           </div>
-          <p className="text-slate-400 text-sm font-semibold tracking-wide">Initializing HealthAI…</p>
+          <p className="text-slate-400 text-sm font-semibold tracking-wide">Initializing NutriCoach...</p>
         </div>
       </div>
     )
@@ -70,61 +53,45 @@ export default function DashboardLayout({
 
   if (!user) return null
 
-  // On desktop: pad the main content left by the current sidebar width so it
-  // never goes underneath the fixed sidebar.  The transition duration matches
-  // the sidebar's own CSS transition so they move together.
-  // On mobile: the sidebar flies in as an overlay, so no padding is needed.
-  const contentPaddingLeft = isDesktop
-    ? sidebarOpen ? SIDEBAR_OPEN_W : SIDEBAR_MINI_W
-    : 0
-
   return (
-    <div
-      className="min-h-screen text-slate-100 relative overflow-x-hidden font-sans"
-      style={{ background: 'linear-gradient(180deg, #060b18 0%, #040812 100%)' }}
-    >
-      {/* ── Ambient background depth ── */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <>
+      {/* Ambient background depth — fixed layer, completely outside the flex shell so it
+          never interferes with sidebar stacking context */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
+        style={{ background: 'linear-gradient(180deg, #060b18 0%, #040812 100%)' }}
+      >
         <div
           className="absolute top-0 left-1/3 w-[1000px] h-[700px] rounded-full blur-[220px]"
-          style={{ background: 'rgba(139,92,246,0.03)' }}
+          style={{ background: 'rgba(139,92,246,0.02)' }}
         />
         <div
           className="absolute bottom-1/4 right-1/4 w-[900px] h-[600px] rounded-full blur-[200px]"
-          style={{ background: 'rgba(16,185,129,0.03)' }}
+          style={{ background: 'rgba(16,185,129,0.02)' }}
         />
       </div>
 
-      {/* ── Fixed sidebar (handles its own mobile backdrop & dock) ── */}
-      <Sidebar />
-
-      {/*
-        ── Main content area ──
-        padding-left tracks the sidebar width exactly.
-        transition matches sidebar's own 300ms ease-in-out width transition.
-      */}
-      <main
-        data-dashboard-main
-        className="relative z-10 min-h-screen pb-28 md:pb-12"
-        style={{
-          paddingLeft: `${contentPaddingLeft}px`,
-          transition: 'padding-left 300ms ease-in-out',
-        }}
+      {/* SidebarProvider is the outermost flex shell:
+          flex min-h-screen w-full — sidebar + main sit side-by-side in normal flow */}
+      <SidebarProvider
+        defaultOpen={true}
+        className="relative z-10 text-slate-100 font-sans"
       >
-        {/* Mobile Header Bar */}
-        <MobileHeader />
+        {/* Sidebar — sticky in-flow column */}
+        <Sidebar />
 
-        {/*
-          Inner content container:
-          – full width within the padded area
-          – capped at 1400px so ultra-wide screens don't look sparse
-          – centered with mx-auto
-          – generous horizontal padding for breathing room
-        */}
-        <div className="w-full px-3.5 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-6 lg:py-8">
-          {children}
-        </div>
-      </main>
-    </div>
+        {/* Main content — flex-1, min-w-0 prevents content from overflowing */}
+        <SidebarInset
+          data-dashboard-main
+          className="min-h-screen pb-24 md:pb-8"
+        >
+          <MobileHeader />
+
+          <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-5 sm:py-6 lg:py-8">
+            {children}
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+    </>
   )
 }

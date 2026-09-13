@@ -1,28 +1,40 @@
 'use client'
 
 import { Suspense, lazy, useState, useEffect } from 'react'
-import { MuscleHeatmap } from './MuscleHeatmap'
+import { Dumbbell } from 'lucide-react'
 import type { MuscleGroup } from '@/types'
 
 const GymOrbCanvas = lazy(() => import('./GymOrbCanvas'))
 
 interface GymOrbProps {
   selectedGroup: MuscleGroup | 'all'
-  onSelectGroup: (g: MuscleGroup | 'all') => void
+  onSelectGroup?: (g: MuscleGroup | 'all') => void
   color?: string
 }
 
-function GymOrbFallback({ selectedGroup, onSelectGroup }: GymOrbProps) {
+function GymOrbFallback() {
   return (
-    <div className="relative flex items-center justify-center" style={{ width: 280, height: 320 }}>
-      <MuscleHeatmap selectedGroup={selectedGroup} onSelectGroup={onSelectGroup} />
+    <div className="relative w-full h-[280px] sm:h-[320px] flex flex-col items-center justify-center rounded-2xl bg-slate-900/40 border border-white/5 p-6">
+      <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-3 animate-pulse">
+        <Dumbbell className="w-8 h-8 text-cyan-400" />
+      </div>
+      <p className="text-white text-xs font-semibold">3D Barbell View</p>
+      <p className="text-slate-500 text-[11px] mt-0.5">Interactive 3D acceleration</p>
     </div>
   )
 }
 
 export function GymOrb(props: GymOrbProps) {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-  const [hasWebGL, setHasWebGL] = useState(true)
+  const [hasWebGL] = useState(() => {
+    if (typeof window === 'undefined') return true
+    try {
+      const canvas = document.createElement('canvas')
+      return Boolean(canvas.getContext('webgl2') || canvas.getContext('webgl'))
+    } catch {
+      return false
+    }
+  })
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -30,23 +42,15 @@ export function GymOrb(props: GymOrbProps) {
     const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
     mq.addEventListener('change', handler)
 
-    try {
-      const canvas = document.createElement('canvas')
-      const gl = canvas.getContext('webgl2') || canvas.getContext('webgl')
-      if (!gl) setHasWebGL(false)
-    } catch {
-      setHasWebGL(false)
-    }
-
     return () => mq.removeEventListener('change', handler)
   }, [])
 
   if (prefersReducedMotion || !hasWebGL) {
-    return <GymOrbFallback {...props} />
+    return <GymOrbFallback />
   }
 
   return (
-    <Suspense fallback={<GymOrbFallback {...props} />}>
+    <Suspense fallback={<GymOrbFallback />}>
       <GymOrbCanvas {...props} />
     </Suspense>
   )

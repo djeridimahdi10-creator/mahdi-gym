@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import {
   DashboardHeader,
+  QuickControlBar,
+  InteractiveQuickLogger,
   HealthMetrics,
   StreakCard,
   TodaysPlan,
@@ -17,57 +19,90 @@ import {
 
 export default function DashboardPage() {
   const [guideOpen, setGuideOpen] = useState(false)
+  const [quickLogOpen, setQuickLogOpen] = useState(false)
 
   return (
-    <div className="space-y-6 sm:space-y-7 w-full pb-10">
-      {/* Beginner Nutrition Guide Modal */}
+    <div className="space-y-6 lg:space-y-8 w-full pb-12 animate-fade-in">
+      {/* Modals */}
       <NutritionGuideModal isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
+      <InteractiveQuickLogger isOpen={quickLogOpen} onClose={() => setQuickLogOpen(false)} />
 
-      {/* Top Header Section */}
+      {/* Header Section */}
       <DashboardHeader onOpenGuide={() => setGuideOpen(true)} />
 
-      {/* ──────────────── ROW 1: Main Health Metrics & 7 Day Streak ──────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
-        <div className="lg:col-span-8">
-          <HealthMetrics />
-        </div>
-        <div className="lg:col-span-4">
-          <StreakCard />
-        </div>
-      </div>
+      {/* Quick Controls */}
+      <QuickControlBar onOpenQuickLog={() => setQuickLogOpen(true)} />
 
-      {/* ──────────────── ROW 2: Today's Plan & AI Coach 24/7 ──────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
-        <div className="lg:col-span-8">
-          <TodaysPlan />
+      {/* Section: Today's Overview */}
+      <section className="space-y-3.5 sm:space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-6 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Today&apos;s Overview</h2>
         </div>
-        <div className="lg:col-span-4">
-          <AICoachPanel />
-        </div>
-      </div>
 
-      {/* ──────────────── ROW 3: Weekly Progress, Nutrient Breakdown & Recommended Action ──────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
-        <div className="lg:col-span-4">
-          <WeeklyProgressChart />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-stretch">
+          <div className="lg:col-span-8 h-full">
+            <HealthMetrics />
+          </div>
+          <div className="lg:col-span-4 h-full">
+            <StreakCard />
+          </div>
         </div>
-        <div className="lg:col-span-4">
-          <NutrientBreakdown />
-        </div>
-        <div className="lg:col-span-4">
-          <RecommendedActionCard />
-        </div>
-      </div>
+      </section>
 
-      {/* ──────────────── ROW 4: Today's Logged Meals & Hydration ──────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
-        <div className="lg:col-span-8">
-          <LoggedMealsRow />
+      {/* Section: Nutrition */}
+      <section className="space-y-3.5 sm:space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-6 rounded-full bg-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.4)]" />
+          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Nutrition</h2>
         </div>
-        <div className="lg:col-span-4">
-          <HydrationCard />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-stretch">
+          <div className="lg:col-span-8 h-full">
+            <TodaysPlan onOpenQuickLog={() => setQuickLogOpen(true)} />
+          </div>
+          <div className="lg:col-span-4 h-full">
+            <HydrationCard />
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* Section: Insights */}
+      <section className="space-y-3.5 sm:space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-6 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.4)]" />
+          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Insights</h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-stretch">
+          <div className="lg:col-span-4 h-full">
+            <WeeklyProgressChart />
+          </div>
+          <div className="lg:col-span-4 h-full">
+            <NutrientBreakdown />
+          </div>
+          <div className="lg:col-span-4 h-full">
+            <AICoachPanel />
+          </div>
+        </div>
+      </section>
+
+      {/* Section: Food Log */}
+      <section className="space-y-3.5 sm:space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-6 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]" />
+          <h2 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Food Log</h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-stretch">
+          <div className="lg:col-span-8 h-full">
+            <LoggedMealsRow onOpenQuickLog={() => setQuickLogOpen(true)} />
+          </div>
+          <div className="lg:col-span-4 h-full">
+            <RecommendedActionCard onOpenQuickLog={() => setQuickLogOpen(true)} />
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

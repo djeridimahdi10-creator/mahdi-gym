@@ -1062,6 +1062,85 @@ h6 {
   animation: btn-shine-sweep 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* ── Modern Glass Dock Container ── */
+.glass-dock {
+  background: rgba(4, 8, 18, 0.78);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.18),
+    0 16px 40px -8px rgba(0, 0, 0, 0.7);
+}
+
+.glass-dock-scrolled {
+  background: rgba(4, 8, 18, 0.92);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.25),
+    0 20px 50px -10px rgba(0, 0, 0, 0.85),
+    0 0 25px rgba(16, 185, 129, 0.12);
+}
+
+/* ── Ultra-glow Flagship Button ── */
+.btn-flagship {
+  background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  color: #040812;
+  box-shadow:
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.45),
+    0 0 25px rgba(16, 185, 129, 0.35),
+    0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-flagship:hover {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    0 0 40px rgba(52, 211, 153, 0.55),
+    0 12px 30px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+}
+.btn-flagship:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ── Liquid Glass Button ── */
+.btn-liquid-glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-liquid-glass:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 20px rgba(52, 211, 153, 0.2),
+    0 8px 25px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1.5px);
+}
+.btn-liquid-glass:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ── Radar Pulse Wave ── */
+@keyframes radar-wave {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  70% { transform: scale(1.6); opacity: 0; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.radar-wave {
+  animation: radar-wave 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
 /* ── Elegant horizontal divider ── */
 .divider-glow {
   height: 1px;
@@ -1887,5 +1966,73 @@ input:-webkit-autofill:focus {
 }
 .glow-ring-ai {
   box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.2), 0 0 12px rgba(168, 85, 247, 0.15);
+}
+
+/* ============================================================
+   NUTRITION DASHBOARD v2 — Redesign Utilities
+   ============================================================ */
+
+/* Standard dark-glass card used throughout the nutrition dashboard */
+.nutrition-card {
+  background: rgba(17, 23, 36, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 1.25rem; /* 20px */
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.nutrition-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Interactive card variant — lifts on hover */
+.nutrition-card-interactive {
+  cursor: pointer;
+}
+.nutrition-card-interactive:hover {
+  transform: translateY(-2px);
+}
+
+/* Large metric value display */
+.nutrition-metric {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+/* Section title style */
+.nutrition-section-title {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem; /* 20px */
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+/* Animated circular progress ring */
+@keyframes progress-ring-fill {
+  from { stroke-dashoffset: var(--ring-circumference, 283); }
+  to { stroke-dashoffset: var(--ring-offset, 0); }
+}
+.progress-ring-circle {
+  animation: progress-ring-fill 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.3s;
+}
+
+/* Subtle fade-up entrance for sections */
+@keyframes nutrition-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.nutrition-fade-up {
+  animation: nutrition-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
