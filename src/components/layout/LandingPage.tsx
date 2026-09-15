@@ -1254,10 +1254,25 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="pt-10 border-t border-white/[0.07] flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs sm:text-sm text-dark-500 font-medium">
-              © 2026 NutriSaaS. All rights reserved.
-            </p>
+          <div className="pt-10 border-t border-white/[0.07] flex flex-col md:flex-row items-center justify-between gap-5">
+            <div className="flex flex-col sm:flex-row items-center gap-3 text-xs sm:text-sm text-dark-400 font-medium text-center md:text-left">
+              <span>© {new Date().getFullYear()} NutriSaaS. All rights reserved.</span>
+              <span className="hidden sm:inline text-dark-700">|</span>
+              <div className="inline-flex items-center gap-2 text-dark-300">
+                <span className="text-dark-400 text-xs tracking-wide">Architected & Engineered by</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/[0.04] border border-white/10 shadow-sm">
+                  <span className="w-5 h-5 rounded-md bg-gradient-to-br from-primary-400 via-primary-500 to-emerald-600 text-dark-950 font-black text-[10px] tracking-tight flex items-center justify-center shadow-[0_0_10px_rgba(52,211,153,0.3)]">
+                    MD
+                  </span>
+                  <span className="font-semibold text-white text-xs tracking-tight">
+                    Mahdi Djeridi
+                  </span>
+                  <span className="hidden sm:inline-block text-[10px] uppercase font-mono tracking-wider px-1.5 py-0.5 rounded bg-white/[0.06] text-primary-300 border border-primary-500/20">
+                    Engineer
+                  </span>
+                </div>
+              </div>
+            </div>
             <div className="flex items-center gap-6">
               {['Privacy', 'Terms', 'Cookies'].map((item) => (
                 <a key={item} href="#" className="text-xs sm:text-sm text-dark-500 hover:text-white transition-colors duration-300">

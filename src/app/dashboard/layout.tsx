@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
 import { Sidebar, MobileHeader } from '@/components/layout'
 import { SidebarProvider, SidebarInset } from '@/components/ui'
@@ -13,6 +13,8 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const pathname = usePathname()
+  const isChat = pathname === '/dashboard/chat'
   const { user, loading, fetchProfile } = useAuthStore()
 
   useEffect(() => {
@@ -75,7 +77,7 @@ export default function DashboardLayout({
           flex min-h-screen w-full — sidebar + main sit side-by-side in normal flow */}
       <SidebarProvider
         defaultOpen={true}
-        className="relative z-10 text-slate-100 font-sans"
+        className="relative z-10 text-slate-100 font-sans w-full max-w-full overflow-x-hidden"
       >
         {/* Sidebar — sticky in-flow column */}
         <Sidebar />
@@ -83,11 +85,21 @@ export default function DashboardLayout({
         {/* Main content — flex-1, min-w-0 prevents content from overflowing */}
         <SidebarInset
           data-dashboard-main
-          className="min-h-screen pb-32 md:pb-10"
+          className={
+            isChat
+              ? 'h-screen max-h-screen overflow-hidden flex flex-col min-w-0 pb-20 md:pb-0'
+              : 'min-h-screen pb-32 md:pb-10'
+          }
         >
           <MobileHeader />
 
-          <div className="w-full mx-auto px-3 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-4 sm:py-6 lg:py-8">
+          <div
+            className={
+              isChat
+                ? 'w-full flex-1 h-full min-h-0 flex flex-col p-2 sm:p-3 md:p-4 overflow-hidden'
+                : 'w-full mx-auto px-3 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-4 sm:py-6 lg:py-8'
+            }
+          >
             {children}
           </div>
         </SidebarInset>

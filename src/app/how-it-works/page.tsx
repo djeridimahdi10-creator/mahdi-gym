@@ -122,9 +122,21 @@ export default function HowItWorksPage() {
             </Link>
           </div>
 
-          <p className="text-dark-400">
-            &copy; {new Date().getFullYear()} NutriSaaS AI. Precision Nutrition & Adaptive Fitness.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-3 text-dark-400 text-center sm:text-right font-medium">
+            <span>&copy; {new Date().getFullYear()} NutriSaaS AI.</span>
+            <span className="hidden sm:inline text-dark-700">|</span>
+            <div className="inline-flex items-center gap-2 text-dark-300">
+              <span className="text-dark-400 text-xs tracking-wide">Architected by</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/[0.04] border border-white/10 shadow-sm">
+                <span className="w-5 h-5 rounded-md bg-gradient-to-br from-primary-400 via-primary-500 to-emerald-600 text-dark-950 font-black text-[10px] tracking-tight flex items-center justify-center shadow-[0_0_10px_rgba(52,211,153,0.3)]">
+                  MD
+                </span>
+                <span className="font-semibold text-white text-xs tracking-tight">
+                  Mahdi Djeridi
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
     </main>

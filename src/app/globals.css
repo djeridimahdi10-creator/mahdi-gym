@@ -2036,3 +2036,348 @@ input:-webkit-autofill:focus {
   animation: nutrition-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* ============================================================
+   CYBERPUNK / HUD NAVBAR SYSTEM
+   ============================================================ */
+
+/* ── HUD Navbar Container ── */
+.hud-navbar {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    rgba(4, 8, 18, 0.88) 0%,
+    rgba(8, 15, 30, 0.82) 100%
+  );
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(52, 211, 153, 0.12);
+  clip-path: polygon(
+    12px 0%, calc(100% - 12px) 0%,
+    100% 12px, 100% calc(100% - 12px),
+    calc(100% - 12px) 100%, 12px 100%,
+    0% calc(100% - 12px), 0% 12px
+  );
+  box-shadow:
+    0 0 1px rgba(52, 211, 153, 0.4),
+    0 4px 30px -8px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(52, 211, 153, 0.08);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hud-navbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: inherit;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(52, 211, 153, 0.03) 50%, transparent 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(52, 211, 153, 0.015) 3px,
+      rgba(52, 211, 153, 0.015) 4px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Scrolled state — more opaque, stronger glow */
+.hud-navbar-scrolled {
+  background: linear-gradient(
+    180deg,
+    rgba(4, 8, 18, 0.95) 0%,
+    rgba(8, 15, 30, 0.92) 100%
+  );
+  border-color: rgba(52, 211, 153, 0.22);
+  box-shadow:
+    0 0 2px rgba(52, 211, 153, 0.5),
+    0 0 20px rgba(52, 211, 153, 0.08),
+    0 8px 40px -8px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(52, 211, 153, 0.12);
+}
+
+/* ── HUD scanning line across navbar ── */
+@keyframes hud-nav-scan {
+  0% { left: -30%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: 130%; opacity: 0; }
+}
+
+.hud-navbar-scan {
+  position: absolute;
+  top: 0;
+  left: -30%;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(52, 211, 153, 0.04),
+    rgba(52, 211, 153, 0.08),
+    rgba(52, 211, 153, 0.04),
+    transparent
+  );
+  clip-path: inherit;
+  pointer-events: none;
+  z-index: 1;
+  animation: hud-nav-scan 4s linear infinite;
+}
+
+/* ── Corner brackets for HUD navbar ── */
+.hud-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hud-corner::before,
+.hud-corner::after {
+  content: '';
+  position: absolute;
+  background: rgba(52, 211, 153, 0.7);
+  filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.6));
+}
+
+/* Top-left */
+.hud-corner-tl { top: -1px; left: -1px; }
+.hud-corner-tl::before { width: 14px; height: 1.5px; top: 0; left: 0; }
+.hud-corner-tl::after { width: 1.5px; height: 14px; top: 0; left: 0; }
+
+/* Top-right */
+.hud-corner-tr { top: -1px; right: -1px; }
+.hud-corner-tr::before { width: 14px; height: 1.5px; top: 0; right: 0; }
+.hud-corner-tr::after { width: 1.5px; height: 14px; top: 0; right: 0; }
+
+/* Bottom-left */
+.hud-corner-bl { bottom: -1px; left: -1px; }
+.hud-corner-bl::before { width: 14px; height: 1.5px; bottom: 0; left: 0; }
+.hud-corner-bl::after { width: 1.5px; height: 14px; bottom: 0; left: 0; }
+
+/* Bottom-right */
+.hud-corner-br { bottom: -1px; right: -1px; }
+.hud-corner-br::before { width: 14px; height: 1.5px; bottom: 0; right: 0; }
+.hud-corner-br::after { width: 1.5px; height: 14px; bottom: 0; right: 0; }
+
+/* ── HUD nav link ── */
+.hud-nav-link {
+  position: relative;
+  font-family: 'Space Grotesk', var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-dark-400);
+  padding: 6px 14px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.hud-nav-link:hover {
+  color: rgba(52, 211, 153, 0.9);
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
+}
+
+.hud-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 70%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.8), transparent);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hud-nav-link:hover::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+.hud-nav-link-active {
+  color: rgba(52, 211, 153, 1);
+  text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+  background: rgba(52, 211, 153, 0.06);
+  border-color: rgba(52, 211, 153, 0.15);
+  clip-path: polygon(6px 0%, calc(100% - 6px) 0%, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0% calc(100% - 6px), 0% 6px);
+}
+
+.hud-nav-link-active::after {
+  transform: translateX(-50%) scaleX(1);
+  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 1), transparent);
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+}
+
+/* ── Data feed / status ticker ── */
+@keyframes hud-data-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.hud-status-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--color-primary-400);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  animation: hud-data-pulse 1.6s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.6));
+}
+
+/* ── HUD CTA Button ── */
+.hud-cta-btn {
+  position: relative;
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.12) 0%, rgba(16, 185, 129, 0.08) 100%);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
+  color: rgba(52, 211, 153, 1);
+  font-family: 'Space Grotesk', var(--font-sans);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.hud-cta-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.25) 0%, rgba(16, 185, 129, 0.15) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hud-cta-btn:hover {
+  border-color: rgba(52, 211, 153, 0.6);
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.2), inset 0 0 20px rgba(52, 211, 153, 0.05);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.hud-cta-btn:hover::before {
+  opacity: 1;
+}
+
+.hud-cta-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ── HUD Ghost Button ── */
+.hud-ghost-btn {
+  font-family: 'Space Grotesk', var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-dark-400);
+  transition: all 0.25s ease;
+}
+
+.hud-ghost-btn:hover {
+  color: rgba(52, 211, 153, 0.8);
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.3);
+}
+
+/* ── HUD Language Switch ── */
+.hud-lang-switch {
+  background: rgba(4, 8, 18, 0.6);
+  border: 1px solid rgba(52, 211, 153, 0.1);
+  clip-path: polygon(4px 0%, calc(100% - 4px) 0%, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0% calc(100% - 4px), 0% 4px);
+}
+
+.hud-lang-btn-active {
+  background: rgba(52, 211, 153, 0.15);
+  color: rgba(52, 211, 153, 1);
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
+  clip-path: polygon(3px 0%, calc(100% - 3px) 0%, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 0% calc(100% - 3px), 0% 3px);
+}
+
+.hud-lang-btn-inactive {
+  color: var(--color-dark-500);
+  transition: all 0.2s ease;
+}
+
+.hud-lang-btn-inactive:hover {
+  color: var(--color-dark-300);
+}
+
+/* ── HUD Mobile Menu ── */
+.hud-mobile-menu {
+  background: linear-gradient(
+    180deg,
+    rgba(4, 8, 18, 0.96) 0%,
+    rgba(8, 15, 30, 0.94) 100%
+  );
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(52, 211, 153, 0.15);
+  clip-path: polygon(
+    12px 0%, calc(100% - 12px) 0%,
+    100% 12px, 100% calc(100% - 12px),
+    calc(100% - 12px) 100%, 12px 100%,
+    0% calc(100% - 12px), 0% 12px
+  );
+  box-shadow:
+    0 0 2px rgba(52, 211, 153, 0.3),
+    0 20px 60px -10px rgba(0, 0, 0, 0.9);
+}
+
+/* ── HUD Mobile Hamburger ── */
+.hud-hamburger {
+  background: rgba(52, 211, 153, 0.06);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  clip-path: polygon(4px 0%, calc(100% - 4px) 0%, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0% calc(100% - 4px), 0% 4px);
+  color: var(--color-primary-400);
+  transition: all 0.25s ease;
+}
+
+.hud-hamburger:hover {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.15);
+}
+
+/* ── HUD Mobile Nav Link ── */
+.hud-mobile-link {
+  font-family: 'Space Grotesk', var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--color-dark-300);
+  padding: 10px 16px;
+  border-left: 2px solid transparent;
+  transition: all 0.25s ease;
+}
+
+.hud-mobile-link:hover {
+  color: rgba(52, 211, 153, 0.9);
+  border-left-color: rgba(52, 211, 153, 0.5);
+  background: rgba(52, 211, 153, 0.04);
+  text-shadow: 0 0 6px rgba(52, 211, 153, 0.3);
+  padding-left: 20px;
+}
+
+/* ── Hex grid scanline effect (subtle bg texture) ── */
+@keyframes hud-grid-scroll {
+  from { background-position: 0 0; }
+  to { background-position: 0 40px; }
+}
+
+.hud-grid-bg {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 19px,
+      rgba(52, 211, 153, 0.025) 19px,
+      rgba(52, 211, 153, 0.025) 20px
+    );
+  animation: hud-grid-scroll 4s linear infinite;
+}
+

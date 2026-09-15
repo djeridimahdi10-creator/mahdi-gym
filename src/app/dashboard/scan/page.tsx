@@ -7,7 +7,7 @@ import {
   Camera, Upload, Flame, Scan, Sparkles, RotateCcw,
   CheckCircle2, Target, Eye, ArrowRight, Plus, Zap, Clock,
   Key, AlertCircle, RefreshCw, ChevronRight, ShieldCheck,
-  Dumbbell, Heart, PieChart, Info
+  Dumbbell, Heart, PieChart, Info, Terminal, Wifi, Shield, Cpu
 } from 'lucide-react'
 import { analyzeFoodImage } from '@/lib/puter-ai'
 import { useNutritionStore } from '@/stores/nutritionStore'
@@ -71,9 +71,17 @@ const SAMPLE_FOODS = [
   },
 ]
 
+/* ── HUD clip-path constants ── */
+const HUD_CLIP = 'polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px)'
+const HUD_CLIP_SM = 'polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px)'
+const HUD_CLIP_XS = 'polygon(4px 0%, calc(100% - 4px) 0%, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0% calc(100% - 4px), 0% 4px)'
+const HUD_HEX = 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)'
+const HUD_DIAMOND = 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)'
+
+const FONT_HUD: React.CSSProperties = { fontFamily: "'Space Grotesk', sans-serif" }
+
 /**
  * Resizes and compresses an image (from file or data URL) to max 1200x1200px
- * to ensure fast upload and prevent payload limit errors.
  */
 async function compressImageToDataUrl(source: File | string, maxDimension = 1200, quality = 0.85): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -163,7 +171,6 @@ export default function ScanPage() {
     }
   }, [])
 
-  // Save API key
   const handleSaveApiKey = (key: string) => {
     setCustomApiKey(key)
     if (key.trim()) {
@@ -174,7 +181,6 @@ export default function ScanPage() {
     setShowKeyModal(false)
   }
 
-  // Handle file select
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -188,7 +194,6 @@ export default function ScanPage() {
       setPortionMultipliers({})
     } catch (err) {
       console.error('Image compression failed:', err)
-      // fallback to direct FileReader
       const reader = new FileReader()
       reader.onload = (ev) => {
         setImage(ev.target?.result as string)
@@ -199,7 +204,6 @@ export default function ScanPage() {
     }
   }
 
-  // Drag & drop handlers
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -232,7 +236,6 @@ export default function ScanPage() {
     }
   }
 
-  // Camera management
   const startCamera = async () => {
     try {
       setScanError(null)
@@ -278,7 +281,6 @@ export default function ScanPage() {
     }
   }
 
-  // Quick sample loader
   const handleLoadSample = async (sampleUrl: string) => {
     setLoading(true)
     setScanError(null)
@@ -291,26 +293,22 @@ export default function ScanPage() {
       setImage(compressed)
       await runAIAnalysis(compressed)
     } catch {
-      // If CORS blocks canvas export of remote unsplash, pass URL directly
       setImage(sampleUrl)
       await runAIAnalysis(sampleUrl)
     }
   }
 
-  // AI Analysis Execution
   const runAIAnalysis = async (imageDataUrl: string) => {
     setLoading(true)
     setScanError(null)
-    setLoadingStep(1) // Preprocessing image
+    setLoadingStep(1)
 
-    // Progress animation steps
-    const step2Timer = setTimeout(() => setLoadingStep(2), 700) // Querying vision AI
-    const step3Timer = setTimeout(() => setLoadingStep(3), 1600) // Calculating macros
+    const step2Timer = setTimeout(() => setLoadingStep(2), 700)
+    const step3Timer = setTimeout(() => setLoadingStep(3), 1600)
 
     try {
       let finalResult: ScanResult | null = null
 
-      // Tier 1: If user provided a custom OpenAI key, prioritize server route with that key
       if (customApiKey && customApiKey.startsWith('sk-')) {
         try {
           const res = await fetch('/api/scan', {
@@ -329,7 +327,6 @@ export default function ScanPage() {
         }
       }
 
-      // Tier 2: Try browser Puter.js GPT-4o-mini Vision (Free, no server key required)
       if (!finalResult) {
         try {
           const puterResult = await analyzeFoodImage(imageDataUrl)
@@ -345,7 +342,6 @@ export default function ScanPage() {
         }
       }
 
-      // Tier 3: Call server /api/scan endpoint
       if (!finalResult) {
         const res = await fetch('/api/scan', {
           method: 'POST',
@@ -364,7 +360,6 @@ export default function ScanPage() {
       clearTimeout(step3Timer)
 
       if (finalResult && finalResult.foods && finalResult.foods.length > 0) {
-        // Initialize portion multipliers
         const initMult: Record<number, number> = {}
         finalResult.foods.forEach((_, idx) => {
           initMult[idx] = 1.0
@@ -372,7 +367,6 @@ export default function ScanPage() {
         setPortionMultipliers(initMult)
         setResults(finalResult)
 
-        // Add to local history
         const primaryFood = finalResult.foods[0]
         const newHistoryItem: ScanHistoryItem = {
           id: Date.now().toString(),
@@ -400,13 +394,11 @@ export default function ScanPage() {
     }
   }
 
-  // Trigger scan on current image
   const analyzeFood = () => {
     if (!image) return
     runAIAnalysis(image)
   }
 
-  // Portion multiplier toggle (0.8x small, 1.0x regular, 1.3x large)
   const handlePortionChange = (index: number, mult: number) => {
     setPortionMultipliers((prev) => ({
       ...prev,
@@ -414,7 +406,6 @@ export default function ScanPage() {
     }))
   }
 
-  // Dynamically calculated calories & macros based on active portion multipliers
   const calculatedTotals = () => {
     if (!results?.foods) return { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
 
@@ -435,7 +426,6 @@ export default function ScanPage() {
 
   const totals = calculatedTotals()
 
-  // Add to Nutrition Daily Store
   const handleAddToLog = () => {
     if (!results?.foods) return
 
@@ -469,7 +459,6 @@ export default function ScanPage() {
     setAddedToLog(true)
   }
 
-  // Reset scanner
   const reset = () => {
     stopCamera()
     setImage(null)
@@ -479,44 +468,53 @@ export default function ScanPage() {
     setScanError(null)
   }
 
-  // Percentage of user's daily calorie goal
   const calorieTargetPct = dailyCalories > 0
     ? Math.min(100, Math.round((totals.calories / dailyCalories) * 100))
     : 0
 
   return (
-    <div className="w-full space-y-6 pb-20 md:pb-10 animate-fade-in">
+    <div className="w-full space-y-5 pb-20 md:pb-10 animate-fade-in">
 
-      {/* ── Page Header ── */}
+      {/* ── Page Header — HUD Terminal ── */}
       <div
-        className="relative rounded-3xl overflow-hidden p-5 sm:p-7"
+        className="relative overflow-hidden p-5 sm:p-7"
         style={{
-          background: 'linear-gradient(135deg, rgba(8,14,28,0.98) 0%, rgba(14,6,22,0.95) 100%)',
-          border: '1px solid rgba(244,63,94,0.18)',
-          boxShadow: '0 0 50px rgba(244,63,94,0.06)',
+          background: 'linear-gradient(135deg, rgba(4, 8, 18, 0.95) 0%, rgba(8, 12, 24, 0.92) 100%)',
+          border: '1px solid rgba(244, 63, 94, 0.15)',
+          clipPath: HUD_CLIP,
+          boxShadow: '0 0 2px rgba(244, 63, 94, 0.3), 0 20px 50px -10px rgba(0, 0, 0, 0.7)',
         }}
       >
-        <div className="absolute top-0 right-0 w-64 h-64 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(244,63,94,0.09) 0%, transparent 70%)', transform: 'translate(20%,-30%)' }} />
+        {/* Corner brackets */}
+        <div className="hud-corner hud-corner-tl" style={{ '--bracket-color': 'rgba(244, 63, 94, 0.6)' } as React.CSSProperties} />
+        <div className="hud-corner hud-corner-tr" style={{ '--bracket-color': 'rgba(244, 63, 94, 0.6)' } as React.CSSProperties} />
+
+        {/* Scanning beam */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(244, 63, 94, 0.4) 50%, transparent 100%)' }} />
+
+        {/* Subtle grid */}
+        <div className="absolute inset-0 pointer-events-none opacity-20 hud-grid-bg" />
+
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div
-              className="w-13 h-13 rounded-2xl flex items-center justify-center animate-pulse-glow-energy"
-              style={{ background: 'linear-gradient(135deg, rgba(244,63,94,0.22), rgba(251,146,60,0.18))', border: '1px solid rgba(244,63,94,0.35)' }}
-            >
-              <Scan className="w-7 h-7 text-coral-400" />
+            {/* Hexagonal icon */}
+            <div className="w-12 h-12 flex items-center justify-center relative flex-shrink-0" style={{ clipPath: HUD_HEX }}>
+              <div className="absolute inset-0" style={{ clipPath: 'inherit', background: 'linear-gradient(135deg, rgba(244,63,94,0.3), rgba(251,146,60,0.2))' }} />
+              <div className="absolute inset-[2px]" style={{ clipPath: HUD_HEX, background: 'rgba(4, 8, 18, 0.85)' }} />
+              <Scan className="w-6 h-6 text-coral-400 relative z-10" />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                  Neural AI Vision
+                <span className="text-[8px] font-extrabold px-2 py-0.5 uppercase tracking-[0.2em] text-coral-300" style={{ ...FONT_HUD, background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.2)', clipPath: HUD_CLIP_XS }}>
+                  Neural Vision
                 </span>
-                <span className="text-[10px] text-slate-500">GPT-4o-mini Vision Engine</span>
+                <span className="text-[9px] uppercase tracking-[0.15em]" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.5)' }}>GPT-4o-mini Engine</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                AI Food & Calorie Scanner
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-wide uppercase" style={{ ...FONT_HUD, letterSpacing: '0.06em' }}>
+                AI Food <span className="text-coral-400">&</span> Calorie Scanner
               </h1>
-              <p className="text-slate-400 text-xs sm:text-sm mt-0.5">
-                Upload or snap any meal. Neural vision instantly detects ingredients, portions, and computes calories.
+              <p className="text-dark-500 text-[10px] sm:text-xs mt-0.5 uppercase tracking-wider" style={FONT_HUD}>
+                Upload or snap meals → Neural vision identifies ingredients & computes macros
               </p>
             </div>
           </div>
@@ -524,15 +522,16 @@ export default function ScanPage() {
           <div className="flex items-center gap-2 self-start md:self-auto">
             <button
               onClick={() => setShowKeyModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer"
+              style={{ ...FONT_HUD, background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.15)', clipPath: HUD_CLIP_XS, color: 'rgba(251,191,36,0.7)' }}
               title="Configure AI API Key"
             >
-              <Key className="w-3.5 h-3.5 text-amber-400" />
-              <span>{customApiKey ? 'Custom Key Active' : 'AI Engine: Puter Free'}</span>
+              <Key className="w-3.5 h-3.5" />
+              <span>{customApiKey ? 'Custom Key' : 'Puter Free'}</span>
             </button>
-            <Badge variant="coral" size="md" glow>
-              Vision v3.8
-            </Badge>
+            <span className="text-[8px] font-extrabold px-2.5 py-1 uppercase tracking-[0.2em]" style={{ ...FONT_HUD, background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.2)', clipPath: HUD_CLIP_XS, color: 'rgba(244,63,94,0.7)' }}>
+              v3.8
+            </span>
           </div>
         </div>
       </div>
@@ -540,32 +539,30 @@ export default function ScanPage() {
       {/* ── API Key Modal ── */}
       {showKeyModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div
-            className="w-full max-w-md rounded-3xl p-6 space-y-4"
-            style={{ background: 'linear-gradient(135deg, #0e1526 0%, #080d1a 100%)', border: '1px solid rgba(255,255,255,0.12)' }}
-          >
+          <div className="w-full max-w-md p-6 space-y-4" style={{ background: 'linear-gradient(135deg, rgba(4,8,18,0.98) 0%, rgba(8,12,24,0.96) 100%)', border: '1px solid rgba(251,191,36,0.15)', clipPath: HUD_CLIP }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
-                  <Key className="w-4 h-4" />
+                <div className="w-8 h-8 flex items-center justify-center" style={{ clipPath: HUD_HEX, background: 'rgba(251,191,36,0.15)', border: '1px solid rgba(251,191,36,0.25)' }}>
+                  <Key className="w-4 h-4 text-amber-400" />
                 </div>
-                <h3 className="text-base font-bold text-white">AI Vision Engine Settings</h3>
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider" style={FONT_HUD}>Vision Engine Config</h3>
               </div>
-              <button onClick={() => setShowKeyModal(false)} className="text-slate-400 hover:text-white text-sm">✕</button>
+              <button onClick={() => setShowKeyModal(false)} className="text-dark-500 hover:text-white text-sm cursor-pointer">✕</button>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed">
-              By default, NutriSaaS uses <strong className="text-white">Puter.js GPT-4o-mini</strong> which is 100% free with no API key needed. If you prefer to use your own personal OpenAI API key, enter it below.
+            <p className="text-[10px] leading-relaxed uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.6)' }}>
+              Default: <strong className="text-white">Puter.js GPT-4o-mini</strong> — 100% free, no key needed. Optional: enter your OpenAI API key below.
             </p>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">OpenAI API Key (optional)</label>
+              <label className="text-[10px] font-bold uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.5)' }}>OpenAI API Key (optional)</label>
               <input
                 type="password"
                 placeholder="sk-..."
                 defaultValue={customApiKey}
                 id="custom-key-input"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 border border-white/10 text-xs text-white focus:outline-none focus:border-rose-500"
+                className="w-full px-3.5 py-2.5 text-xs text-white focus:outline-none bg-transparent"
+                style={{ border: '1px solid rgba(251,191,36,0.15)', clipPath: HUD_CLIP_SM, background: 'rgba(4,8,18,0.6)' }}
               />
             </div>
 
@@ -575,16 +572,18 @@ export default function ScanPage() {
                   const input = document.getElementById('custom-key-input') as HTMLInputElement
                   handleSaveApiKey(input?.value || '')
                 }}
-                className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-rose-500 hover:bg-rose-400 text-white transition-all shadow-lg shadow-rose-500/20"
+                className="hud-cta-btn flex-1 py-2.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer text-center"
+                style={{ ...FONT_HUD, borderColor: 'rgba(251,191,36,0.35)', color: 'rgba(251,191,36,1)' }}
               >
-                Save Settings
+                Save Config
               </button>
               {customApiKey && (
                 <button
                   onClick={() => handleSaveApiKey('')}
-                  className="px-3 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-white/5 border border-white/10"
+                  className="px-3 py-2.5 text-[10px] font-bold text-dark-500 hover:text-white transition-colors cursor-pointer uppercase tracking-wider"
+                  style={{ ...FONT_HUD, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', clipPath: HUD_CLIP_XS }}
                 >
-                  Clear Key
+                  Purge
                 </button>
               )}
             </div>
@@ -592,14 +591,14 @@ export default function ScanPage() {
         </div>
       )}
 
-      {/* ── Quick Sample Meal Chips ── */}
-      <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] space-y-2.5">
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+      {/* ── Quick Sample Meals ── */}
+      <div className="p-4" style={{ background: 'rgba(4,8,18,0.6)', border: '1px solid rgba(52,211,153,0.08)', clipPath: HUD_CLIP_SM }}>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-1.5" style={{ ...FONT_HUD, color: 'rgba(52,211,153,0.5)' }}>
             <Sparkles className="w-3.5 h-3.5 text-coral-400" />
-            Quick Test: Click a sample meal to test the AI scanner instantly
+            Quick Test: 1-click sample scan
           </p>
-          <span className="text-[10px] text-slate-500 hidden sm:inline">1-Click Scan Demo</span>
+          <span className="text-[8px] uppercase tracking-[0.2em] hidden sm:inline" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.4)' }}>Demo Mode</span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -608,34 +607,35 @@ export default function ScanPage() {
               key={sample.name}
               onClick={() => handleLoadSample(sample.url)}
               disabled={loading}
-              className="flex items-center gap-2.5 p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.06] hover:border-coral-500/40 text-left transition-all hover:scale-[1.02] disabled:opacity-50 group"
+              className="flex items-center gap-2.5 p-2.5 text-left transition-all hover:scale-[1.02] disabled:opacity-50 group cursor-pointer"
+              style={{ background: 'rgba(8,15,30,0.5)', border: '1px solid rgba(52,211,153,0.06)', clipPath: HUD_CLIP_XS }}
             >
               <span className="text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">{sample.emoji}</span>
               <div className="min-w-0">
-                <p className="text-xs font-bold text-white truncate group-hover:text-coral-300 transition-colors">
+                <p className="text-[10px] font-bold text-white truncate group-hover:text-primary-300 transition-colors uppercase tracking-wider" style={FONT_HUD}>
                   {sample.name}
                 </p>
-                <p className="text-[10px] text-slate-500 truncate">{sample.desc}</p>
+                <p className="text-[9px] text-dark-600 truncate" style={FONT_HUD}>{sample.desc}</p>
               </div>
             </button>
           ))}
         </div>
       </div>
 
-      {/* ── Error Banner if any ── */}
+      {/* ── Error Banner ── */}
       {scanError && (
-        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-3 animate-fade-in">
-          <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
+        <div className="p-4 flex items-start gap-3 animate-fade-in" style={{ background: 'rgba(244,63,94,0.06)', border: '1px solid rgba(244,63,94,0.2)', clipPath: HUD_CLIP_SM }}>
+          <AlertCircle className="w-5 h-5 text-coral-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1 text-xs">
-            <p className="font-bold text-rose-300">Scan Notice</p>
-            <p className="text-slate-300 mt-0.5">{scanError}</p>
+            <p className="font-bold text-coral-300 uppercase tracking-wider text-[10px]" style={FONT_HUD}>Scan Error</p>
+            <p className="text-dark-400 mt-0.5" style={FONT_HUD}>{scanError}</p>
           </div>
-          <button onClick={() => setScanError(null)} className="text-slate-400 hover:text-white text-xs">✕</button>
+          <button onClick={() => setScanError(null)} className="text-dark-500 hover:text-white text-xs cursor-pointer">✕</button>
         </div>
       )}
 
       {/* ── Main 2-Column Grid ── */}
-      <div className="grid lg:grid-cols-12 gap-6">
+      <div className="grid lg:grid-cols-12 gap-5">
 
         {/* ── Left Column: Scanner Viewport (5 cols) ── */}
         <div className="lg:col-span-5 space-y-4">
@@ -645,124 +645,110 @@ export default function ScanPage() {
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`rounded-3xl overflow-hidden relative aspect-square max-h-[360px] sm:max-h-[420px] mx-auto w-full transition-all duration-300 ${dragActive ? 'scale-[1.01] ring-2 ring-coral-400 ring-offset-2 ring-offset-black' : ''
-              }`}
+            className={`overflow-hidden relative aspect-square max-h-[360px] sm:max-h-[420px] mx-auto w-full transition-all duration-300 ${dragActive ? 'scale-[1.01]' : ''}`}
             style={{
               background: '#030712',
-              border: `1px solid ${dragActive
-                  ? 'rgba(244,63,94,0.8)'
-                  : cameraActive || image
-                    ? 'rgba(244,63,94,0.35)'
-                    : 'rgba(255,255,255,0.08)'
-                }`,
+              border: `1px solid ${dragActive ? 'rgba(244,63,94,0.6)' : cameraActive || image ? 'rgba(244,63,94,0.25)' : 'rgba(52,211,153,0.08)'}`,
+              clipPath: HUD_CLIP,
               boxShadow: cameraActive || image
-                ? '0 0 60px rgba(244,63,94,0.12), 0 20px 40px rgba(0,0,0,0.6)'
-                : '0 20px 40px rgba(0,0,0,0.5)',
+                ? '0 0 2px rgba(244,63,94,0.4), 0 20px 40px rgba(0,0,0,0.6)'
+                : '0 0 1px rgba(52,211,153,0.2), 0 20px 40px rgba(0,0,0,0.5)',
             }}
           >
-            {/* Dark Vignette Overlay */}
+            {/* Corner brackets */}
+            <div className="hud-corner hud-corner-tl" />
+            <div className="hud-corner hud-corner-tr" />
+            <div className="hud-corner hud-corner-bl" />
+            <div className="hud-corner hud-corner-br" />
+
+            {/* Vignette */}
             <div className="absolute inset-0 pointer-events-none z-10" style={{ background: 'radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,0.75) 100%)' }} />
 
-            {/* Hidden canvas for snapshot / compression */}
             <canvas ref={canvasRef} className="hidden" />
 
-            {/* 1. Camera Active View */}
+            {/* 1. Camera Active */}
             {cameraActive ? (
               <>
                 <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline />
-                {/* HUD Reticle Corners */}
+                {/* HUD Reticle */}
                 <div className="absolute inset-6 z-20 pointer-events-none">
                   {[
-                    'top-0 left-0 border-t-2 border-l-2 rounded-tl-lg',
-                    'top-0 right-0 border-t-2 border-r-2 rounded-tr-lg',
-                    'bottom-0 left-0 border-b-2 border-l-2 rounded-bl-lg',
-                    'bottom-0 right-0 border-b-2 border-r-2 rounded-br-lg',
+                    'top-0 left-0 border-t-2 border-l-2',
+                    'top-0 right-0 border-t-2 border-r-2',
+                    'bottom-0 left-0 border-b-2 border-l-2',
+                    'bottom-0 right-0 border-b-2 border-r-2',
                   ].map((cls, i) => (
                     <div key={i} className={`absolute w-8 h-8 border-coral-400 ${cls}`} style={{ filter: 'drop-shadow(0 0 8px rgba(244,63,94,0.9))' }} />
                   ))}
-                  {/* Laser Scan Line */}
                   <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-coral-400 to-transparent animate-scan-line" style={{ boxShadow: '0 0 16px rgba(244,63,94,0.9)' }} />
                 </div>
 
                 <div className="absolute top-4 left-4 z-20">
-                  <div className="bg-black/80 border border-coral-400/50 text-coral-300 flex items-center gap-2 px-3 py-1 rounded-xl text-[10px] font-bold">
-                    <span className="w-2 h-2 rounded-full bg-coral-400 animate-ping" />
-                    LIVE CAMERA
+                  <div className="flex items-center gap-2 px-3 py-1 text-[9px] font-bold uppercase tracking-[0.2em]" style={{ ...FONT_HUD, background: 'rgba(0,0,0,0.85)', border: '1px solid rgba(244,63,94,0.4)', clipPath: HUD_CLIP_XS, color: 'rgba(244,63,94,0.9)' }}>
+                    <span className="w-2 h-2 bg-coral-400 animate-ping" style={{ clipPath: HUD_DIAMOND }} />
+                    Live Feed
                   </div>
                 </div>
 
                 <div className="absolute bottom-5 left-0 right-0 flex items-center justify-center gap-4 z-20">
-                  <button
-                    onClick={stopCamera}
-                    className="px-4 py-2 rounded-xl bg-black/80 text-slate-300 text-xs font-semibold hover:text-white border border-white/10"
-                  >
-                    Cancel
+                  <button onClick={stopCamera} className="px-4 py-2 text-xs font-bold text-dark-400 hover:text-white transition-colors cursor-pointer uppercase tracking-wider" style={{ ...FONT_HUD, background: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', clipPath: HUD_CLIP_XS }}>
+                    Abort
                   </button>
                   <button
                     onClick={capturePhoto}
-                    className="w-16 h-16 rounded-full bg-white hover:scale-110 active:scale-95 transition-all duration-200"
-                    style={{ border: '4px solid rgba(244,63,94,0.85)', boxShadow: '0 0 30px rgba(244,63,94,0.6)' }}
+                    className="w-16 h-16 bg-white hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer"
+                    style={{ clipPath: 'polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)', border: '4px solid rgba(244,63,94,0.85)', boxShadow: '0 0 30px rgba(244,63,94,0.6)' }}
                     aria-label="Capture photo"
                   />
                 </div>
               </>
             ) : image ? (
-              /* 2. Image Loaded View */
+              /* 2. Image Loaded */
               <div className="relative w-full h-full">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={image} alt="Target meal" className="w-full h-full object-cover" />
 
-                {/* Laser scan animation while loading */}
                 {loading && (
                   <div className="absolute inset-0 z-20 pointer-events-none">
                     <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-scan-line" style={{ boxShadow: '0 0 18px rgba(52,211,153,0.9)' }} />
                   </div>
                 )}
 
-                {/* Target HUD Bounding box */}
+                {/* Target bounding box */}
                 <div className="absolute inset-0 z-15 pointer-events-none p-8">
                   <div
-                    className="absolute top-1/4 left-1/4 w-1/2 h-1/2 border-2 border-dashed rounded-2xl flex items-start p-2 transition-all"
+                    className="absolute top-1/4 left-1/4 w-1/2 h-1/2 border-2 border-dashed flex items-start p-2 transition-all"
                     style={{
                       borderColor: loading ? 'rgba(52,211,153,0.7)' : 'rgba(244,63,94,0.7)',
                       boxShadow: loading ? '0 0 25px rgba(52,211,153,0.25)' : '0 0 20px rgba(244,63,94,0.2)',
                     }}
                   >
-                    <span
-                      className="text-[9px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1"
-                      style={{
-                        background: loading ? 'rgba(16,185,129,0.85)' : 'rgba(244,63,94,0.85)',
-                        color: 'white',
-                      }}
-                    >
-                      <Target className="w-2.5 h-2.5" /> {loading ? 'Analyzing Food' : 'Target Acquired'}
+                    <span className="text-[8px] font-extrabold px-2 py-0.5 flex items-center gap-1 uppercase tracking-[0.15em]" style={{ ...FONT_HUD, background: loading ? 'rgba(16,185,129,0.85)' : 'rgba(244,63,94,0.85)', color: 'white', clipPath: HUD_CLIP_XS }}>
+                      <Target className="w-2.5 h-2.5" /> {loading ? 'Analyzing' : 'Acquired'}
                     </span>
                   </div>
                 </div>
 
                 <div className="absolute top-4 left-4 z-20">
-                  <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-black/85 text-[10px] font-bold text-emerald-300 border border-emerald-500/40 backdrop-blur-md">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> IMAGE LOADED
+                  <div className="flex items-center gap-2 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em]" style={{ ...FONT_HUD, background: 'rgba(0,0,0,0.85)', border: '1px solid rgba(52,211,153,0.3)', clipPath: HUD_CLIP_XS, color: 'rgba(52,211,153,0.8)' }}>
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Image Loaded
                   </div>
                 </div>
               </div>
             ) : (
-              /* 3. Empty State / Dropzone */
+              /* 3. Empty Dropzone */
               <div
                 onClick={() => fileInputRef.current?.click()}
                 className="h-full flex flex-col items-center justify-center text-center p-8 relative z-10 cursor-pointer group"
               >
-                <div
-                  className="w-20 h-20 rounded-3xl flex items-center justify-center mb-4 transition-transform group-hover:scale-105"
-                  style={{ background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.25)' }}
-                >
+                <div className="w-20 h-20 flex items-center justify-center mb-4 transition-transform group-hover:scale-105" style={{ clipPath: HUD_HEX, background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.2)' }}>
                   <Upload className="w-10 h-10 text-coral-400 group-hover:text-coral-300 transition-colors" />
                 </div>
-                <p className="text-base font-bold text-white mb-1.5">Drop Food Photo Here</p>
-                <p className="text-xs text-slate-500 max-w-[240px] leading-relaxed mb-4">
-                  Drag and drop an image or click to browse. Supports JPG, PNG, WEBP, HEIC.
+                <p className="text-sm font-bold text-white mb-1.5 uppercase tracking-wider" style={FONT_HUD}>Drop Food Photo</p>
+                <p className="text-[10px] max-w-[240px] leading-relaxed mb-4 uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.5)' }}>
+                  Drag & drop or click to browse. JPG, PNG, WEBP, HEIC.
                 </p>
-                <span className="text-[11px] font-bold text-coral-400 px-3 py-1 rounded-full bg-coral-500/10 border border-coral-500/20">
+                <span className="text-[10px] font-bold px-3 py-1 uppercase tracking-[0.15em] cursor-pointer" style={{ ...FONT_HUD, background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.2)', clipPath: HUD_CLIP_XS, color: 'rgba(244,63,94,0.8)' }}>
                   Browse Files
                 </span>
               </div>
@@ -775,220 +761,169 @@ export default function ScanPage() {
               <button
                 onClick={startCamera}
                 disabled={cameraActive || loading}
-                className="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-bold text-xs sm:text-sm transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(52,211,153,0.18), rgba(16,185,129,0.12))',
-                  border: '1px solid rgba(52,211,153,0.35)',
-                  color: '#34d399',
-                  boxShadow: '0 0 20px rgba(52,211,153,0.08)',
-                }}
+                className="flex items-center justify-center gap-2 py-3 px-4 font-bold text-xs sm:text-sm transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40 cursor-pointer uppercase tracking-wider"
+                style={{ ...FONT_HUD, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', clipPath: HUD_CLIP_SM, color: 'rgba(52,211,153,0.8)' }}
               >
-                <Camera className="w-4 h-4" /> Live Camera
+                <Camera className="w-4 h-4" /> Camera
               </button>
 
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={cameraActive || loading}
-                className="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-bold text-xs sm:text-sm transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(251,146,60,0.18), rgba(249,115,22,0.12))',
-                  border: '1px solid rgba(251,146,60,0.35)',
-                  color: '#fb923c',
-                  boxShadow: '0 0 20px rgba(251,146,60,0.08)',
-                }}
+                className="flex items-center justify-center gap-2 py-3 px-4 font-bold text-xs sm:text-sm transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40 cursor-pointer uppercase tracking-wider"
+                style={{ ...FONT_HUD, background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.2)', clipPath: HUD_CLIP_SM, color: 'rgba(251,146,60,0.8)' }}
               >
-                <Upload className="w-4 h-4" /> Upload Picture
+                <Upload className="w-4 h-4" /> Upload
               </button>
             </div>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileSelect}
-            />
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
 
             {/* Analyze CTA */}
             <button
               onClick={analyzeFood}
               disabled={!image || loading || cameraActive}
-              className="w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl font-bold text-sm sm:text-base transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="hud-cta-btn w-full flex items-center justify-center gap-2.5 py-4 font-bold text-xs sm:text-sm transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer uppercase tracking-wider"
               style={{
-                background: loading
-                  ? 'linear-gradient(135deg, rgba(168,85,247,0.3), rgba(147,51,234,0.25))'
-                  : 'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)',
-                color: 'white',
-                border: '1px solid rgba(244,63,94,0.5)',
-                boxShadow: image && !loading
-                  ? '0 0 35px rgba(244,63,94,0.45), 0 8px 20px rgba(0,0,0,0.4)'
-                  : 'none',
+                ...FONT_HUD,
+                borderColor: loading ? 'rgba(168,85,247,0.3)' : 'rgba(244,63,94,0.4)',
+                color: loading ? 'rgba(168,85,247,0.9)' : 'rgba(244,63,94,1)',
+                background: loading ? 'rgba(168,85,247,0.1)' : 'rgba(244,63,94,0.12)',
+                boxShadow: image && !loading ? '0 0 25px rgba(244,63,94,0.15)' : 'none',
               }}
             >
               {loading ? (
                 <>
                   <RefreshCw className="w-5 h-5 animate-spin" />
                   <span>
-                    {loadingStep === 1
-                      ? 'Preprocessing Food Photo…'
-                      : loadingStep === 2
-                        ? 'Analyzing with GPT-4o-mini Vision…'
-                        : 'Calculating Calories & Macros…'}
+                    {loadingStep === 1 ? 'Preprocessing…' : loadingStep === 2 ? 'GPT-4o Vision Scan…' : 'Computing Macros…'}
                   </span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-5 h-5" />
-                  <span>Scan Food & Calculate Calories</span>
+                  <Sparkles className="w-5 h-5 relative z-10" />
+                  <span className="relative z-10">Scan & Compute</span>
                 </>
               )}
             </button>
 
             {image && !loading && (
-              <button
-                onClick={reset}
-                className="w-full py-2.5 rounded-2xl text-xs font-semibold text-slate-400 hover:text-white flex items-center justify-center gap-2 transition-colors"
-              >
-                <RotateCcw className="w-3.5 h-3.5" /> Reset & Clear Image
+              <button onClick={reset} className="w-full py-2.5 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.5)' }}>
+                <RotateCcw className="w-3.5 h-3.5" /> Reset Scanner
               </button>
             )}
           </div>
         </div>
 
-        {/* ── Right Column: Nutrition Results Panel (7 cols) ── */}
+        {/* ── Right Column: Results Panel (7 cols) ── */}
         <div className="lg:col-span-7">
           <div
-            className="rounded-3xl min-h-[460px] flex flex-col overflow-hidden"
+            className="min-h-[460px] flex flex-col overflow-hidden"
             style={{
-              background: 'linear-gradient(180deg, rgba(8,14,28,0.98) 0%, rgba(12,20,38,0.96) 100%)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.55)',
+              background: 'linear-gradient(180deg, rgba(4,8,18,0.95) 0%, rgba(8,14,28,0.93) 100%)',
+              border: '1px solid rgba(52,211,153,0.08)',
+              clipPath: HUD_CLIP,
+              boxShadow: '0 0 1px rgba(52,211,153,0.2), 0 20px 40px rgba(0,0,0,0.55)',
             }}
           >
-            {/* State 1: Loading skeleton with radar */}
+            {/* Corner brackets */}
+            <div className="hud-corner hud-corner-tl" />
+            <div className="hud-corner hud-corner-tr" />
+            <div className="hud-corner hud-corner-bl" />
+            <div className="hud-corner hud-corner-br" />
+
+            {/* State 1: Loading */}
             {loading ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-6">
                 <div className="relative w-28 h-28">
-                  <div className="absolute inset-0 rounded-full border-2 border-coral-400/20" />
-                  <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-coral-400 animate-spin" />
-                  <div
-                    className="absolute inset-3 rounded-full flex items-center justify-center"
-                    style={{ background: 'rgba(244,63,94,0.12)', border: '1px solid rgba(244,63,94,0.3)' }}
-                  >
+                  <div className="absolute inset-0 border-2 border-coral-400/20" style={{ clipPath: HUD_HEX }} />
+                  <div className="absolute inset-0 border-2 border-transparent border-t-coral-400 animate-spin" style={{ clipPath: 'circle(50%)' }} />
+                  <div className="absolute inset-3 flex items-center justify-center" style={{ clipPath: HUD_HEX, background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.2)' }}>
                     <Eye className="w-10 h-10 text-coral-400 animate-breathe" />
                   </div>
                 </div>
 
                 <div className="space-y-1.5 max-w-sm">
-                  <h3 className="text-lg font-bold text-white tracking-tight">
-                    {loadingStep === 1
-                      ? 'Extracting Image Features…'
-                      : loadingStep === 2
-                        ? 'Neural AI Identifying Ingredients…'
-                        : 'Computing Calorie Density & Macros…'}
+                  <h3 className="text-base font-bold text-white tracking-wide uppercase" style={FONT_HUD}>
+                    {loadingStep === 1 ? 'Extracting Features…' : loadingStep === 2 ? 'Neural AI Scan…' : 'Computing Macros…'}
                   </h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    Analyzing plate portions against comprehensive nutrition databases to calculate exact macronutrients.
+                  <p className="text-[10px] leading-relaxed uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.5)' }}>
+                    Analyzing plate portions against nutrition databases for exact macronutrient computation.
                   </p>
                 </div>
 
                 <div className="w-full max-w-md space-y-3 px-4">
                   {[...Array(3)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="skeleton-shimmer h-14 rounded-2xl"
-                      style={{ animationDelay: `${i * 0.18}s` }}
-                    />
+                    <div key={i} className="skeleton-shimmer h-14" style={{ animationDelay: `${i * 0.18}s`, clipPath: HUD_CLIP_SM }} />
                   ))}
                 </div>
               </div>
             ) : results ? (
-              /* State 2: Scan Results Detailed Display */
+              /* State 2: Results */
               <div className="flex-1 flex flex-col">
 
-                {/* Hero Calories Banner */}
-                <div className="p-6 bg-gradient-to-r from-rose-500/10 via-amber-500/5 to-transparent border-b border-white/[0.08]">
+                {/* Calories Banner */}
+                <div className="p-5 sm:p-6" style={{ background: 'linear-gradient(135deg, rgba(244,63,94,0.06) 0%, rgba(251,146,60,0.03) 100%)', borderBottom: '1px solid rgba(52,211,153,0.08)' }}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold text-coral-400 uppercase tracking-wider">
-                        Total Energy Content
-                      </span>
+                      <span className="text-[8px] font-extrabold uppercase tracking-[0.2em]" style={{ ...FONT_HUD, color: 'rgba(244,63,94,0.7)' }}>Total Energy</span>
                       {results.provider && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-slate-300">
+                        <span className="text-[8px] px-2 py-0.5 uppercase tracking-[0.15em]" style={{ ...FONT_HUD, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', clipPath: HUD_CLIP_XS, color: 'rgba(100,116,139,0.5)' }}>
                           {results.provider}
                         </span>
                       )}
                     </div>
-                    <Badge variant="coral" size="sm" glow>
+                    <span className="text-[8px] font-extrabold px-2.5 py-0.5 uppercase tracking-[0.2em]" style={{ ...FONT_HUD, background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.15)', clipPath: HUD_CLIP_XS, color: 'rgba(52,211,153,0.7)' }}>
                       AI Verified
-                    </Badge>
+                    </span>
                   </div>
 
                   <div className="flex items-baseline justify-between flex-wrap gap-4">
                     <div className="flex items-baseline gap-3">
-                      <span
-                        className="text-5xl sm:text-6xl font-black tracking-tight"
-                        style={{
-                          fontFamily: 'Space Grotesk, sans-serif',
-                          background: 'linear-gradient(135deg, #fb923c, #f43f5e)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                        }}
-                      >
+                      <span className="text-5xl sm:text-6xl font-black tracking-tight" style={{ ...FONT_HUD, background: 'linear-gradient(135deg, #fb923c, #f43f5e)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                         {totals.calories}
                       </span>
                       <div>
-                        <p className="text-base text-slate-300 font-bold">kcal</p>
-                        <p className="text-[11px] text-slate-500">estimated total</p>
+                        <p className="text-sm text-dark-300 font-bold uppercase tracking-wider" style={FONT_HUD}>kcal</p>
+                        <p className="text-[9px] uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.4)' }}>estimated</p>
                       </div>
                     </div>
 
                     {dailyCalories > 0 && (
                       <div className="text-right">
-                        <div className="flex items-center gap-1.5 justify-end text-xs font-bold text-emerald-400">
+                        <div className="flex items-center gap-1.5 justify-end text-[10px] font-bold uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(52,211,153,0.8)' }}>
                           <Flame className="w-4 h-4 text-coral-400" />
                           <span>{calorieTargetPct}% of daily budget</span>
                         </div>
-                        <p className="text-[10px] text-slate-500 mt-0.5">Target: {dailyCalories} kcal</p>
+                        <p className="text-[9px] mt-0.5 uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.4)' }}>Target: {dailyCalories} kcal</p>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Macro Breakdown Pills */}
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 p-5 border-b border-white/[0.08] bg-black/20">
-                  <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-center">
-                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Protein</p>
-                    <p className="text-xl font-extrabold text-white mt-0.5">{totals.protein}g</p>
-                    <p className="text-[9px] text-slate-500 mt-0.5">{totals.protein * 4} kcal</p>
-                  </div>
-
-                  <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-center">
-                    <p className="text-[10px] font-bold text-sky-400 uppercase tracking-wider">Carbs</p>
-                    <p className="text-xl font-extrabold text-white mt-0.5">{totals.carbs}g</p>
-                    <p className="text-[9px] text-slate-500 mt-0.5">{totals.carbs * 4} kcal</p>
-                  </div>
-
-                  <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-center">
-                    <p className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Fat</p>
-                    <p className="text-xl font-extrabold text-white mt-0.5">{totals.fat}g</p>
-                    <p className="text-[9px] text-slate-500 mt-0.5">{totals.fat * 9} kcal</p>
-                  </div>
-
-                  <div className="hidden sm:block p-3 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-center">
-                    <p className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Fiber</p>
-                    <p className="text-xl font-extrabold text-white mt-0.5">{totals.fiber || 5}g</p>
-                    <p className="text-[9px] text-slate-500 mt-0.5">Digestive</p>
-                  </div>
+                {/* Macro Pills */}
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 p-5" style={{ borderBottom: '1px solid rgba(52,211,153,0.06)', background: 'rgba(0,0,0,0.15)' }}>
+                  {[
+                    { label: 'Protein', value: `${totals.protein}g`, sub: `${totals.protein * 4} kcal`, color: 'rgba(52,211,153,0.8)' },
+                    { label: 'Carbs', value: `${totals.carbs}g`, sub: `${totals.carbs * 4} kcal`, color: 'rgba(56,189,248,0.8)' },
+                    { label: 'Fat', value: `${totals.fat}g`, sub: `${totals.fat * 9} kcal`, color: 'rgba(251,191,36,0.8)' },
+                    { label: 'Fiber', value: `${totals.fiber || 5}g`, sub: 'Digestive', color: 'rgba(168,85,247,0.8)', hideMobile: true },
+                  ].map((m) => (
+                    <div key={m.label} className={`p-3 text-center ${m.hideMobile ? 'hidden sm:block' : ''}`} style={{ background: 'rgba(8,15,30,0.5)', border: `1px solid ${m.color.replace('0.8', '0.12')}`, clipPath: HUD_CLIP_XS }}>
+                      <p className="text-[8px] font-extrabold uppercase tracking-[0.2em]" style={{ ...FONT_HUD, color: m.color }}>{m.label}</p>
+                      <p className="text-xl font-extrabold text-white mt-0.5" style={FONT_HUD}>{m.value}</p>
+                      <p className="text-[8px] mt-0.5 uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.4)' }}>{m.sub}</p>
+                    </div>
+                  ))}
                 </div>
 
-                {/* Detected Ingredients List */}
+                {/* Detected Ingredients */}
                 <div className="p-5 flex-1 space-y-3 overflow-y-auto max-h-[320px]">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                      Identified Ingredients & Portions ({results.foods.length})
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em]" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.6)' }}>
+                      Detected Items ({results.foods.length})
                     </p>
-                    <span className="text-[10px] text-slate-500">Adjust Portion: S / M / L</span>
+                    <span className="text-[8px] uppercase tracking-[0.15em]" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.4)' }}>Portion: S / M / L</span>
                   </div>
 
                   {results.foods.map((food, i) => {
@@ -1000,53 +935,54 @@ export default function ScanPage() {
                     const confPct = Math.round((food.confidence || 0.9) * 100)
 
                     return (
-                      <div
-                        key={i}
-                        className="p-3.5 rounded-2xl bg-white/[0.025] hover:bg-white/[0.04] border border-white/[0.07] transition-all space-y-2.5"
-                      >
+                      <div key={i} className="p-3.5 transition-all space-y-2.5" style={{ background: 'rgba(8,15,30,0.4)', border: '1px solid rgba(52,211,153,0.06)', clipPath: HUD_CLIP_SM }}>
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 flex-shrink-0 mt-0.5">
-                              <CheckCircle2 className="w-4 h-4" />
+                            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 mt-0.5" style={{ clipPath: HUD_HEX, background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.15)' }}>
+                              <CheckCircle2 className="w-4 h-4 text-primary-400" />
                             </div>
                             <div>
-                              <p className="text-sm font-bold text-white capitalize">{food.name}</p>
-                              <p className="text-xs text-slate-400 mt-0.5">
-                                Estimated: <span className="text-slate-300 font-semibold">{food.portion}</span>
+                              <p className="text-xs font-bold text-white capitalize uppercase tracking-wider" style={FONT_HUD}>{food.name}</p>
+                              <p className="text-[10px] mt-0.5 uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.5)' }}>
+                                Est: <span className="text-dark-300 font-semibold">{food.portion}</span>
                               </p>
                               <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[10px] text-emerald-400 font-semibold">{itemProtein}g P</span>
-                                <span className="text-[10px] text-slate-600">·</span>
-                                <span className="text-[10px] text-sky-400 font-semibold">{itemCarbs}g C</span>
-                                <span className="text-[10px] text-slate-600">·</span>
-                                <span className="text-[10px] text-amber-400 font-semibold">{itemFat}g F</span>
+                                <span className="text-[9px] font-semibold" style={{ ...FONT_HUD, color: 'rgba(52,211,153,0.8)' }}>{itemProtein}g P</span>
+                                <span className="text-[9px]" style={{ color: 'rgba(100,116,139,0.3)' }}>·</span>
+                                <span className="text-[9px] font-semibold" style={{ ...FONT_HUD, color: 'rgba(56,189,248,0.8)' }}>{itemCarbs}g C</span>
+                                <span className="text-[9px]" style={{ color: 'rgba(100,116,139,0.3)' }}>·</span>
+                                <span className="text-[9px] font-semibold" style={{ ...FONT_HUD, color: 'rgba(251,191,36,0.8)' }}>{itemFat}g F</span>
                               </div>
                             </div>
                           </div>
 
                           <div className="text-right flex-shrink-0">
-                            <p className="text-lg font-extrabold text-coral-400">{itemCal}</p>
-                            <p className="text-[9px] text-slate-500 -mt-0.5">kcal</p>
-                            <span className="text-[9px] font-semibold text-slate-500">{confPct}% match</span>
+                            <p className="text-lg font-extrabold text-coral-400" style={FONT_HUD}>{itemCal}</p>
+                            <p className="text-[8px] -mt-0.5 uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.4)' }}>kcal</p>
+                            <span className="text-[8px] font-semibold uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.4)' }}>{confPct}% match</span>
                           </div>
                         </div>
 
-                        {/* Portion adjustment buttons */}
-                        <div className="flex items-center justify-between pt-1 border-t border-white/[0.04] gap-2">
-                          <span className="text-[10px] text-slate-500 flex-shrink-0">Portion:</span>
+                        {/* Portion buttons */}
+                        <div className="flex items-center justify-between pt-1 gap-2" style={{ borderTop: '1px solid rgba(52,211,153,0.04)' }}>
+                          <span className="text-[9px] flex-shrink-0 uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.4)' }}>Portion:</span>
                           <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap justify-end">
                             {[
                               { label: 'Small (0.8x)', short: '0.8x S', val: 0.8 },
-                              { label: 'Regular (1.0x)', short: '1.0x Reg', val: 1.0 },
+                              { label: 'Regular (1.0x)', short: '1.0x M', val: 1.0 },
                               { label: 'Large (1.3x)', short: '1.3x L', val: 1.3 },
                             ].map((p) => (
                               <button
                                 key={p.val}
                                 onClick={() => handlePortionChange(i, p.val)}
-                                className={`px-2 sm:px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${mult === p.val
-                                    ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20'
-                                    : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
-                                  }`}
+                                className="px-2 sm:px-2.5 py-1 text-[9px] font-bold transition-all cursor-pointer uppercase tracking-wider"
+                                style={{
+                                  ...FONT_HUD,
+                                  clipPath: HUD_CLIP_XS,
+                                  ...(mult === p.val
+                                    ? { background: 'rgba(244,63,94,0.2)', color: 'rgba(244,63,94,1)', border: '1px solid rgba(244,63,94,0.3)' }
+                                    : { background: 'rgba(255,255,255,0.03)', color: 'rgba(100,116,139,0.5)', border: '1px solid rgba(255,255,255,0.05)' }),
+                                }}
                               >
                                 <span className="sm:hidden">{p.short}</span>
                                 <span className="hidden sm:inline">{p.label}</span>
@@ -1059,112 +995,95 @@ export default function ScanPage() {
                   })}
                 </div>
 
-                {/* Bottom Action Footer */}
-                <div className="p-5 border-t border-white/[0.08] bg-black/30 space-y-2.5">
+                {/* Bottom CTA */}
+                <div className="p-5 space-y-2.5" style={{ borderTop: '1px solid rgba(52,211,153,0.06)', background: 'rgba(0,0,0,0.2)' }}>
                   <button
                     onClick={handleAddToLog}
                     disabled={addedToLog}
-                    className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-                    style={
-                      addedToLog
-                        ? {
-                          background: 'rgba(52,211,153,0.15)',
-                          border: '1px solid rgba(52,211,153,0.4)',
-                          color: '#34d399',
-                        }
-                        : {
-                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                          color: 'white',
-                          boxShadow: '0 0 25px rgba(16,185,129,0.35)',
-                        }
-                    }
+                    className="hud-cta-btn w-full flex items-center justify-center gap-2 py-4 font-bold text-xs sm:text-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer uppercase tracking-wider"
+                    style={{
+                      ...FONT_HUD,
+                      ...(addedToLog
+                        ? { background: 'rgba(52,211,153,0.08)', borderColor: 'rgba(52,211,153,0.3)', color: 'rgba(52,211,153,0.8)' }
+                        : { background: 'rgba(52,211,153,0.12)', borderColor: 'rgba(52,211,153,0.4)', color: 'rgba(52,211,153,1)', boxShadow: '0 0 25px rgba(16,185,129,0.15)' }),
+                    }}
                   >
                     {addedToLog ? (
                       <>
-                        <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                        <span>Added to Today&apos;s Nutrition Log!</span>
+                        <CheckCircle2 className="w-5 h-5 relative z-10" />
+                        <span className="relative z-10">Logged to Daily Nutrition</span>
                       </>
                     ) : (
                       <>
-                        <Plus className="w-5 h-5" />
-                        <span>Log This Meal ({totals.calories} kcal)</span>
+                        <Plus className="w-5 h-5 relative z-10" />
+                        <span className="relative z-10">Log Meal ({totals.calories} kcal)</span>
                       </>
                     )}
                   </button>
 
                   {addedToLog && (
-                    <div className="flex items-center justify-between text-xs px-2 pt-1">
-                      <span className="text-slate-400">Meal logged to your daily dashboard</span>
-                      <Link
-                        href="/dashboard/nutrition"
-                        className="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1"
-                      >
-                        View in Nutrition Hub <ChevronRight className="w-3.5 h-3.5" />
+                    <div className="flex items-center justify-between text-[10px] px-2 pt-1 uppercase tracking-wider" style={FONT_HUD}>
+                      <span style={{ color: 'rgba(100,116,139,0.4)' }}>Meal logged to daily dashboard</span>
+                      <Link href="/dashboard/nutrition" className="font-bold flex items-center gap-1 hover:text-primary-300 transition-colors" style={{ color: 'rgba(52,211,153,0.7)' }}>
+                        View Nutrition <ChevronRight className="w-3.5 h-3.5" />
                       </Link>
                     </div>
                   )}
                 </div>
               </div>
             ) : (
-              /* State 3: Empty Instructions & Scan History */
+              /* State 3: Empty Instructions & History */
               <div className="flex-1 flex flex-col justify-between">
                 <div className="p-8 text-center space-y-6">
-                  <div
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
-                  >
-                    <Scan className="w-8 h-8 text-slate-500" />
+                  <div className="w-16 h-16 flex items-center justify-center mx-auto" style={{ clipPath: HUD_HEX, background: 'rgba(52,211,153,0.04)', border: '1px solid rgba(52,211,153,0.08)' }}>
+                    <Scan className="w-8 h-8 text-dark-600" />
                   </div>
 
                   <div className="space-y-1.5 max-w-sm mx-auto">
-                    <h3 className="text-base font-bold text-white">Ready for Food Recognition</h3>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      Take or upload a photo then click &ldquo;Scan Food & Calculate Calories&rdquo; to see a complete calorie and macro breakdown.
+                    <h3 className="text-sm font-bold text-white uppercase tracking-wider" style={FONT_HUD}>
+                      Awaiting <span className="text-primary-400">Input</span>
+                    </h3>
+                    <p className="text-[10px] leading-relaxed uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.5)' }}>
+                      Capture or upload a photo → tap &ldquo;Scan & Compute&rdquo; for full macro breakdown.
                     </p>
                   </div>
 
                   {/* 3 Step Guide */}
                   <div className="space-y-2 text-left max-w-md mx-auto">
                     {[
-                      { num: '01', title: 'Snap or upload photo', desc: 'Capture your plate from above in good lighting' },
-                      { num: '02', title: 'Neural Vision identification', desc: 'AI segments each food ingredient and estimates grams' },
-                      { num: '03', title: 'Instant calories & logging', desc: 'Review macros, adjust portions, and log in one click' },
+                      { num: '01', title: 'Capture or upload photo', desc: 'Overhead angle, good lighting recommended' },
+                      { num: '02', title: 'Neural vision identification', desc: 'AI segments ingredients, estimates grams' },
+                      { num: '03', title: 'Instant calorie logging', desc: 'Review macros, adjust portions, log in 1-click' },
                     ].map((step) => (
-                      <div
-                        key={step.num}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]"
-                      >
-                        <span className="text-xs font-black text-rose-400 w-6 flex-shrink-0">{step.num}</span>
+                      <div key={step.num} className="flex items-center gap-3 p-3" style={{ background: 'rgba(8,15,30,0.4)', border: '1px solid rgba(52,211,153,0.05)', clipPath: HUD_CLIP_XS }}>
+                        <span className="text-[10px] font-extrabold w-6 flex-shrink-0 uppercase" style={{ ...FONT_HUD, color: 'rgba(244,63,94,0.7)' }}>{step.num}</span>
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-white">{step.title}</p>
-                          <p className="text-[10px] text-slate-500">{step.desc}</p>
+                          <p className="text-[10px] font-bold text-white uppercase tracking-wider" style={FONT_HUD}>{step.title}</p>
+                          <p className="text-[9px] uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.4)' }}>{step.desc}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Scan History Drawer */}
-                <div className="p-5 border-t border-white/[0.06] bg-black/20">
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">
-                    Recent Meal Scans
+                {/* Scan History */}
+                <div className="p-5" style={{ borderTop: '1px solid rgba(52,211,153,0.06)', background: 'rgba(0,0,0,0.15)' }}>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] mb-2.5" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.5)' }}>
+                    Recent Scans
                   </p>
                   <div className="space-y-2">
                     {history.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04] text-xs"
-                      >
+                      <div key={item.id} className="flex items-center justify-between p-2.5 text-xs" style={{ background: 'rgba(8,15,30,0.3)', border: '1px solid rgba(52,211,153,0.04)', clipPath: HUD_CLIP_XS }}>
                         <div className="flex items-center gap-2.5">
                           <span className="text-lg">{item.emoji}</span>
                           <div>
-                            <p className="font-bold text-white text-xs">{item.name}</p>
-                            <p className="text-[10px] text-slate-500 flex items-center gap-1">
+                            <p className="font-bold text-white text-[10px] uppercase tracking-wider" style={FONT_HUD}>{item.name}</p>
+                            <p className="text-[9px] flex items-center gap-1 uppercase tracking-wider" style={{ ...FONT_HUD, color: 'rgba(100,116,139,0.4)' }}>
                               <Clock className="w-2.5 h-2.5" /> {item.time} · {item.protein} protein
                             </p>
                           </div>
                         </div>
-                        <span className="font-extrabold text-coral-400 text-xs">{item.cal} kcal</span>
+                        <span className="font-extrabold text-coral-400 text-[10px] uppercase tracking-wider" style={FONT_HUD}>{item.cal} kcal</span>
                       </div>
                     ))}
                   </div>
@@ -1177,4 +1096,3 @@ export default function ScanPage() {
     </div>
   )
 }
-

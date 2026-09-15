@@ -462,12 +462,12 @@ export function Sidebar() {
         {/* ══════════════════════════════
             FOOTER
         ══════════════════════════════ */}
-        <SidebarFooter className="mt-auto p-4 border-t border-white/[0.08] gap-3">
+        <SidebarFooter className="mt-auto p-2.5 sm:p-3.5 border-t border-white/[0.08] gap-2">
 
           {/* ── Daily Calorie Progress ── */}
           {isExpanded ? (
             <div
-              className="rounded-2xl p-3.5 relative overflow-hidden"
+              className="rounded-2xl p-2.5 sm:p-3 relative overflow-hidden"
               style={{
                 background: 'rgba(16,185,129,0.07)',
                 border: '1px solid rgba(16,185,129,0.16)',
@@ -481,7 +481,7 @@ export function Sidebar() {
                     'radial-gradient(ellipse at top left,rgba(16,185,129,0.14),transparent 68%)',
                 }}
               />
-              <div className="relative flex items-center justify-between mb-2.5">
+              <div className="relative flex items-center justify-between mb-2">
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-400/80">
                   Daily Progress
                 </span>
@@ -491,7 +491,7 @@ export function Sidebar() {
                 </span>
               </div>
               <div
-                className="h-1.5 rounded-full overflow-hidden mb-2.5"
+                className="h-1.5 rounded-full overflow-hidden mb-2"
                 style={{ background: 'rgba(255,255,255,0.07)' }}
               >
                 <div
@@ -530,7 +530,7 @@ export function Sidebar() {
           {/* ── User profile row ── */}
           <div
             className={`rounded-xl flex items-center transition-all duration-200 ${
-              isExpanded ? 'gap-3 p-2.5' : 'justify-center p-2'
+              isExpanded ? 'gap-2.5 p-2 sm:p-2.5' : 'justify-center p-1.5'
             }`}
             style={{
               background: 'rgba(255,255,255,0.03)',
@@ -587,7 +587,7 @@ export function Sidebar() {
             <button
               onClick={signOut}
               aria-label="Sign out"
-              className="w-full flex items-center justify-center gap-2.5 rounded-xl py-2.5 font-semibold text-[13px] transition-all duration-200 active:scale-[0.98] group/logout"
+              className="w-full flex items-center justify-center gap-2 rounded-xl py-2 font-semibold text-xs sm:text-[13px] transition-all duration-200 active:scale-[0.98] group/logout"
               style={{
                 background: 'rgba(244,63,94,0.08)',
                 border: '1px solid rgba(244,63,94,0.22)',
