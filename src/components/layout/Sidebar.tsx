@@ -196,6 +196,7 @@ function Icon3D({
 ───────────────────────────────────────────────────────────── */
 export function Sidebar() {
   const pathname = usePathname()
+  const isChat = pathname === '/dashboard/chat'
   const { profile, signOut } = useAuthStore()
   const { dailyCalories, meals } = useNutritionStore()
   const { state, setOpenMobile, setOpen, isMobile } = useSidebar()
@@ -637,6 +638,7 @@ export function Sidebar() {
       {/* ══════════════════════════════
           MOBILE BOTTOM DOCK
       ══════════════════════════════ */}
+      {!isChat && (
       <nav
         className="fixed bottom-2.5 left-1/2 -translate-x-1/2 z-50 md:hidden flex items-center justify-around px-2 py-2 rounded-2xl"
         style={{
@@ -676,6 +678,7 @@ export function Sidebar() {
           )
         })}
       </nav>
+      )}
     </>
   )
 }

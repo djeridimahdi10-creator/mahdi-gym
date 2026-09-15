@@ -87,7 +87,7 @@ export default function DashboardLayout({
           data-dashboard-main
           className={
             isChat
-              ? 'h-screen max-h-screen overflow-hidden flex flex-col min-w-0 pb-20 md:pb-0'
+              ? 'h-screen max-h-screen overflow-hidden flex flex-col min-w-0'
               : 'min-h-screen pb-32 md:pb-10'
           }
         >
