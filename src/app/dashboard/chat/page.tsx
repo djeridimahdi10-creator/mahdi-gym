@@ -147,11 +147,11 @@ export default function ChatPage() {
     >
       {/* ── Outer Chat Card — HUD Terminal ── */}
       <div
-        className="flex-1 flex flex-col overflow-hidden min-h-0 relative h-full"
+        className="flex-1 flex flex-col overflow-hidden min-h-0 relative h-full rounded-sm sm:rounded-none"
         style={{
           background: 'linear-gradient(180deg, rgba(4, 8, 18, 0.95) 0%, rgba(6, 11, 24, 0.98) 100%)',
           border: '1px solid rgba(52, 211, 153, 0.12)',
-          clipPath: 'polygon(16px 0%, calc(100% - 16px) 0%, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0% calc(100% - 16px), 0% 16px)',
+          clipPath: 'polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px)',
           boxShadow: '0 0 2px rgba(52, 211, 153, 0.3), 0 20px 60px -10px rgba(0, 0, 0, 0.8)',
         }}
       >
@@ -174,7 +174,7 @@ export default function ChatPage() {
 
         {/* ── Chat Header — HUD Terminal Bar ── */}
         <div
-          className="flex-shrink-0 px-4 sm:px-7 py-2.5 sm:py-3.5 flex items-center justify-between relative z-10 gap-2 min-w-0"
+          className="flex-shrink-0 px-3 sm:px-7 py-2 sm:py-3.5 flex items-center justify-between relative z-10 gap-2 min-w-0"
           style={{
             borderBottom: '1px solid rgba(52, 211, 153, 0.1)',
             background: 'rgba(4, 8, 18, 0.9)',
@@ -310,7 +310,7 @@ export default function ChatPage() {
         {/* ── Messages Scroll Area ── */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto px-3.5 sm:px-6 py-3 sm:py-5 space-y-2 min-h-0 relative z-10"
+          className="flex-1 overflow-y-auto px-2.5 sm:px-6 py-2.5 sm:py-5 space-y-1.5 sm:space-y-2 min-h-0 relative z-10"
           style={{ scrollbarWidth: 'thin' }}
         >
           {isEmpty ? (
@@ -479,7 +479,7 @@ export default function ChatPage() {
 
         {/* ── Input Area — HUD Terminal Input ── */}
         <div
-          className="flex-shrink-0 p-2 sm:p-3.5 relative z-10"
+          className="flex-shrink-0 p-1.5 sm:p-3.5 relative z-10"
           style={{
             borderTop: '1px solid rgba(52, 211, 153, 0.1)',
             background: 'rgba(4, 8, 18, 0.95)',
@@ -489,9 +489,9 @@ export default function ChatPage() {
           <div className="max-w-4xl mx-auto w-full space-y-2">
             {/* Quick Topic Chips */}
             {!isEmpty && (
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
                 <span
-                  className="text-[9px] font-bold uppercase tracking-[0.2em] flex-shrink-0"
+                  className="text-[9px] font-bold uppercase tracking-[0.2em] flex-shrink-0 hidden sm:block"
                   style={{ color: 'rgba(52, 211, 153, 0.4)', fontFamily: "'Space Grotesk', sans-serif" }}
                 >
                   Quick:
@@ -502,7 +502,7 @@ export default function ChatPage() {
                     <button
                       key={topic.label}
                       onClick={() => sendMessage(topic.prompt)}
-                      className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold text-dark-400 hover:text-primary-300 transition-all flex-shrink-0 cursor-pointer uppercase tracking-wider"
+                      className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 text-[9px] sm:text-[10px] font-bold text-dark-400 hover:text-primary-300 transition-all flex-shrink-0 cursor-pointer uppercase tracking-wider active:scale-95"
                       style={{
                         background: 'rgba(52, 211, 153, 0.04)',
                         border: '1px solid rgba(52, 211, 153, 0.08)',
@@ -520,18 +520,18 @@ export default function ChatPage() {
 
             {/* Input Bar */}
             <div
-              className="flex items-end gap-2 p-1.5 sm:p-2 transition-all duration-200"
+              className="flex items-end gap-1.5 sm:gap-2 p-1 sm:p-2 transition-all duration-200"
               style={{
                 background: 'rgba(8, 15, 30, 0.6)',
                 border: `1px solid ${input.trim() ? 'rgba(52, 211, 153, 0.3)' : 'rgba(52, 211, 153, 0.08)'}`,
-                clipPath: 'polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px)',
+                clipPath: 'polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px)',
                 boxShadow: input.trim()
                   ? '0 0 20px rgba(52, 211, 153, 0.08), inset 0 0 30px rgba(52, 211, 153, 0.02)'
                   : '0 4px 14px rgba(0, 0, 0, 0.2)',
               }}
             >
               {/* Terminal prompt indicator */}
-              <div className="flex items-center gap-1 pl-2 pb-2 flex-shrink-0">
+              <div className="hidden sm:flex items-center gap-1 pl-2 pb-2 flex-shrink-0">
                 <span className="text-primary-400/50 text-xs font-mono">❯</span>
               </div>
 
@@ -540,11 +540,11 @@ export default function ChatPage() {
                 value={input}
                 onChange={autoResize}
                 onKeyDown={handleKeyDown}
-                placeholder="Enter query — nutrition, workout splits, recovery protocols…"
+                placeholder="Ask anything — nutrition, workouts…"
                 rows={1}
-                className="w-full resize-none py-1.5 px-1 sm:py-2 sm:px-2 text-sm sm:text-[14.5px] leading-relaxed text-white placeholder:text-dark-600 outline-none bg-transparent"
+                className="w-full resize-none py-2 px-1.5 sm:py-2 sm:px-2 text-sm sm:text-[14.5px] leading-relaxed text-white placeholder:text-dark-600 outline-none bg-transparent"
                 style={{
-                  maxHeight: '140px',
+                  maxHeight: '120px',
                   scrollbarWidth: 'none',
                   fontFamily: "'Space Grotesk', sans-serif",
                 }}
@@ -553,7 +553,7 @@ export default function ChatPage() {
               <motion.button
                 onClick={() => sendMessage()}
                 disabled={!input.trim() || loading}
-                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center flex-shrink-0 transition-all duration-150 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                className="w-10 h-10 sm:w-10 sm:h-10 flex items-center justify-center flex-shrink-0 transition-all duration-150 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
                 style={{
                   background: input.trim()
                     ? 'rgba(52, 211, 153, 0.15)'
@@ -577,10 +577,11 @@ export default function ChatPage() {
             </div>
 
             {/* Micro terminal footer */}
-            <div className="flex items-center justify-between px-2 text-[9px] uppercase tracking-[0.15em]" style={{ color: 'rgba(100, 116, 139, 0.5)', fontFamily: "'Space Grotesk', sans-serif" }}>
-              <span className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between px-1 sm:px-2 text-[9px] uppercase tracking-[0.15em]" style={{ color: 'rgba(100, 116, 139, 0.5)', fontFamily: "'Space Grotesk', sans-serif" }}>
+              <span className="hidden xs:flex items-center gap-1.5">
                 <CornerDownLeft className="w-3 h-3 text-dark-600" />
-                <span>Enter to transmit · Shift+Enter for newline</span>
+                <span className="hidden sm:inline">Enter to transmit · </span>
+                <span>Shift+Enter for newline</span>
               </span>
 
               <span className="hidden sm:flex items-center gap-1.5">

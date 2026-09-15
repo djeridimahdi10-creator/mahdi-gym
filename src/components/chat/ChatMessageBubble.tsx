@@ -72,7 +72,7 @@ export function ChatMessageBubble({ message, index = 0 }: ChatMessageBubbleProps
       )}
 
       {/* ── Message Content Column ── */}
-      <div className={`flex flex-col max-w-[88%] sm:max-w-[80%] md:max-w-[75%] ${isAI ? 'items-start' : 'items-end'}`}>
+      <div className={`flex flex-col max-w-[92%] sm:max-w-[80%] md:max-w-[75%] ${isAI ? 'items-start' : 'items-end'}`}>
         {/* Sender Name & Timestamp Header */}
         <div className={`flex items-center gap-2 mb-1.5 px-1 text-xs ${isAI ? 'flex-row' : 'flex-row-reverse'}`}>
           <span

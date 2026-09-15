@@ -87,7 +87,7 @@ export function ChatSuggestions({ onSelectSuggestion }: ChatSuggestionsProps) {
   const filtered = SUGGESTIONS.filter((s) => activeCategory === 'all' || s.category === activeCategory)
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-3 pt-1 px-2">
+    <div className="w-full max-w-5xl mx-auto space-y-2.5 sm:space-y-3 pt-1 px-1 sm:px-2">
       {/* Category filter tabs — angular HUD style */}
       <div className="flex items-center justify-center gap-1 sm:gap-1.5 flex-wrap">
         {categories.map((cat) => {
@@ -123,14 +123,14 @@ export function ChatSuggestions({ onSelectSuggestion }: ChatSuggestionsProps) {
       </div>
 
       {/* Suggestion Cards Grid — angular HUD cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2">
         {filtered.map((s, index) => {
           const colors = categoryColors[s.category]
           return (
             <motion.button
               key={s.text}
               onClick={() => onSelectSuggestion(s.text)}
-              className="group flex items-start gap-3 p-3 sm:p-3.5 text-left transition-all duration-200 relative overflow-hidden cursor-pointer"
+              className="group flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3.5 text-left transition-all duration-200 relative overflow-hidden cursor-pointer"
               style={{
                 background: 'rgba(8, 15, 30, 0.6)',
                 border: `1px solid ${colors.border}`,
